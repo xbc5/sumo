@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/mmcdole/gofeed"
+	"github.com/xbc5/sumo/pkg/feed"
 )
 
 func main() {
-  fp := gofeed.NewParser()
-  feed, _ := fp.ParseURL("https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw")
-  fmt.Println(feed.Title)
+	feed, _ := feed.Get("https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw")
+	fmt.Println(feed.Items)
 }
