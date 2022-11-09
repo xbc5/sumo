@@ -1,6 +1,8 @@
 package feed
 
-import "github.com/mmcdole/gofeed"
+import (
+	"github.com/mmcdole/gofeed"
+)
 
 type Image struct {
 	URL   *string
@@ -23,8 +25,8 @@ type Item struct {
 	Author      *string
 	Authors     []*string
 	GUID        *string
-	Image       *Image
-	Categories  []*string
+	Banner      *Image
+	Categories  []string
 	Attachments []*Attachment
 }
 
@@ -32,38 +34,42 @@ type Feed struct {
 	Title       *string
 	Description *string
 	FeedLink    *string
-	Links       []*string
+	Links       []string
 	Items       []*Item
 	Language    *string
 	Logo        *Image
-	Categories  []*string
+	Categories  []string
 }
 
 func makeFeed(theirs *gofeed.Feed) *Feed {
-	ourImg := new(Image)
-	ourImg.Title = &theirs.Image.Title
-	ourImg.URL = &theirs.Image.URL
-
 	ours := new(Feed)
+
+	if theirs.Image != nil {
+		ourImg := new(Image)
+		ourImg.Title = &theirs.Image.Title
+		ourImg.URL = &theirs.Image.URL
+		ours.Logo = ourImg
+	}
+
 	ours.Title = &theirs.Title
 	ours.Description = &theirs.Description
 	ours.Language = &theirs.Language
-	ours.Logo = ourImg
-	for i := 0; i < len(theirs.Links); i++ {
-		ours.Links[i] = &theirs.Links[i]
-	}
-	for i := 0; i < len(theirs.Categories); i++ {
-		ours.Categories[i] = &theirs.Categories[i]
-	}
+	ours.Links = theirs.Links
+	ours.Categories = theirs.Categories
+
 	return ours
 }
 
 func makeItem(theirs *gofeed.Item) *Item {
-	ourImg := new(Image)
-	ourImg.Title = &theirs.Image.Title
-	ourImg.URL = &theirs.Image.URL
-
 	ours := new(Item)
+
+	if theirs.Image != nil {
+		ourImg := new(Image)
+		ourImg.Title = &theirs.Image.Title
+		ourImg.URL = &theirs.Image.URL
+		ours.Banner = ourImg
+	}
+
 	ours.Title = &theirs.Title
 	ours.Description = &theirs.Description
 	ours.Content = &theirs.Content
@@ -72,13 +78,14 @@ func makeItem(theirs *gofeed.Item) *Item {
 	ours.Published = &theirs.Published
 	ours.Author = &theirs.Author.Name
 	ours.GUID = &theirs.GUID
-	ours.Image = ourImg
+	ours.Categories = theirs.Categories
+
+	ours.Authors = make([]*string, len(theirs.Authors))
 	for i := 0; i < len(theirs.Authors); i++ {
 		ours.Authors[i] = &theirs.Authors[i].Name
 	}
-	for i := 0; i < len(theirs.Categories); i++ {
-		ours.Categories[i] = &theirs.Categories[i]
-	}
+
+	ours.Attachments = make([]*Attachment, len(theirs.Enclosures))
 	for i := 0; i < len(theirs.Enclosures); i++ {
 		ours.Attachments[i].URL = &theirs.Enclosures[i].URL
 		ours.Attachments[i].Length = &theirs.Enclosures[i].Length
@@ -89,16 +96,16 @@ func makeItem(theirs *gofeed.Item) *Item {
 }
 
 func makeItems(theirs []*gofeed.Item) []*Item {
-	var result []*Item
+	var result = make([]*Item, len(theirs))
 	for i := 0; i < len(theirs); i++ {
 		result[i] = makeItem(theirs[i])
 	}
 	return result
 }
 
-func Get(url *string) (*Feed, error) {
+func Get(url string) (*Feed, error) {
 	fp := gofeed.NewParser()
-	theirFeed, err := fp.ParseURL(*url)
+	theirFeed, err := fp.ParseURL(url)
 	ourFeed := makeFeed(theirFeed)
 	ourItems := makeItems(theirFeed.Items)
 	ourFeed.Items = ourItems
