@@ -31,18 +31,11 @@ type Item struct {
 type Feed struct {
 	Title       *string
 	Description *string
-	Link        *string
 	FeedLink    *string
-	Updated     *string
 	Links       []*string
 	Items       []*Item
-	Published   *string
-	Author      *string
-	Authors     []*string
 	Language    *string
-	Image       *Image
-	Copyright   *string
-	Generator   *string
+	Logo        *Image
 	Categories  []*string
 }
 
@@ -54,22 +47,13 @@ func makeFeed(theirs *gofeed.Feed) *Feed {
 	ours := new(Feed)
 	ours.Title = &theirs.Title
 	ours.Description = &theirs.Description
-	ours.Link = &theirs.Link
-	ours.Updated = &theirs.Updated
-	ours.Published = &theirs.Published
-	ours.Author = &theirs.Author.Name
 	ours.Language = &theirs.Language
-	ours.Image = ourImg
-	ours.Copyright = &theirs.Copyright
-	ours.Generator = &theirs.Generator
+	ours.Logo = ourImg
 	for i := 0; i < len(theirs.Links); i++ {
 		ours.Links[i] = &theirs.Links[i]
 	}
 	for i := 0; i < len(theirs.Categories); i++ {
 		ours.Categories[i] = &theirs.Categories[i]
-	}
-	for i := 0; i < len(theirs.Authors); i++ {
-		ours.Authors[i] = &theirs.Authors[i].Name
 	}
 	return ours
 }
