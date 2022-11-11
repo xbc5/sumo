@@ -1,4 +1,4 @@
-package db
+package schema
 
 import (
 	"database/sql"
@@ -24,7 +24,7 @@ func createTable(name string, db *sql.DB, columns []string) {
 	log.Printf("Table creation OK: %s", name)
 }
 
-func CreateSchema(db *sql.DB) {
+func Create(db *sql.DB) {
 	maxUrl := 2083 // smallest value (MS edge)
 	descLen := 512
 	titleLen := 256
