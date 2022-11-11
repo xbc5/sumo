@@ -56,4 +56,12 @@ func CreateSchema(db *sql.DB) {
 		"name VARCHAR(20)",
 	}
 	createTable("Tag", db, tagCols)
+
+	attachmentCols := []string{
+		"id INTEGER PRIMARY KEY",
+		fmt.Sprintf("url VARCHAR(%d)", maxUrl),
+		"length INTEGER",
+		"type VARCHAR(20)",
+	}
+	createTable("Attachment", db, attachmentCols)
 }
