@@ -9,7 +9,7 @@ import (
 
 func createTable(name string, db *sql.DB, columns []string) {
 	cols := strings.Join(columns, ", ")
-	query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s NULL);", name, cols)
+	query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s);", name, cols)
 
 	statement, err := db.Prepare(query)
 	if err != nil {
@@ -70,4 +70,19 @@ func CreateSchema(db *sql.DB) {
 		"name VARCHAR(50)",
 	}
 	createTable("Author", db, authorCols)
+
+	// bridge tables
+	articleTagCols := []string{
+		"article_id INTEGER",
+		"tag_id INTEGER",
+		"CONSTRAINT con_primary_name PRIMARY KEY (article_id,tag_id)",
+	}
+	createTable("ArticleTag", db, articleTagCols)
+
+	articleAttachmentCols := []string{
+		"article_id INTEGER",
+		"attachment_id INTEGER",
+		"CONSTRAINT con_primary_name PRIMARY KEY (article_id,attachment_id)",
+	}
+	createTable("ArticleAttachment", db, articleAttachmentCols)
 }
