@@ -99,4 +99,11 @@ func CreateSchema(db *sql.DB) {
 		"CONSTRAINT con_primary_name PRIMARY KEY (feed_id,tag_id)",
 	}
 	createTable("FeedTag", db, feedTagCols)
+
+	feedArticle := []string{
+		"feed_id INTEGER",
+		"article_id INTEGER",
+		"CONSTRAINT con_primary_name PRIMARY KEY (feed_id,article_id)",
+	}
+	createTable("FeedArticle", db, feedArticle)
 }
