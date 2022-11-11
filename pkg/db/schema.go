@@ -50,4 +50,10 @@ func CreateSchema(db *sql.DB) {
 		fmt.Sprintf("banner VARCHAR(%d)", maxUrl),
 	}
 	createTable("Article", db, articleCols)
+
+	tagCols := []string{
+		"id INTEGER PRIMARY KEY",
+		"name VARCHAR(20)",
+	}
+	createTable("Tag", db, tagCols)
 }
