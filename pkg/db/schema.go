@@ -85,4 +85,11 @@ func CreateSchema(db *sql.DB) {
 		"CONSTRAINT con_primary_name PRIMARY KEY (article_id,attachment_id)",
 	}
 	createTable("ArticleAttachment", db, articleAttachmentCols)
+
+	articleAuthorCols := []string{
+		"article_id INTEGER",
+		"author_id INTEGER",
+		"CONSTRAINT con_primary_name PRIMARY KEY (article_id,author_id)",
+	}
+	createTable("ArticleAuthor", db, articleAuthorCols)
 }
