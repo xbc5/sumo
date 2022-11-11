@@ -25,13 +25,29 @@ func createTable(name string, db *sql.DB, columns []string) {
 }
 
 func CreateSchema(db *sql.DB) {
+	maxUrl := 2083 // smallest value (MS edge)
+	descLen := 512
+	titleLen := 256
+
 	feedCols := []string{
 		"id INTEGER PRIMARY KEY",
-		"title VARCHAR(256)",
-		"description VARCHAR(512)",
-		"url VARCHAR(2600)",
+		fmt.Sprintf("title VARCHAR(%d)", titleLen),
+		fmt.Sprintf("description VARCHAR(%d)", descLen),
+		fmt.Sprintf("url VARCHAR(%d)", maxUrl),
 		"language VARCHAR(10)",
-		"logo VARCHAR(2600)",
+		fmt.Sprintf("logo VARCHAR(%d)", maxUrl),
 	}
 	createTable("Feed", db, feedCols)
+
+	articleCols := []string{
+		"id INTEGER PRIMARY KEY",
+		fmt.Sprintf("title VARCHAR(%d)", titleLen),
+		fmt.Sprintf("description VARCHAR(%d)", descLen),
+		"content VARCHAR(100000)", // FIXME: have truncated field if >100k
+		fmt.Sprintf("url VARCHAR(%d)", maxUrl),
+		"updated INTEGER",   // must be unix time
+		"published INTEGER", // integer is easier to do comparisons
+		fmt.Sprintf("banner VARCHAR(%d)", maxUrl),
+	}
+	createTable("Article", db, articleCols)
 }
