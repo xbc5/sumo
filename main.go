@@ -13,6 +13,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//log.SetOutput(ioutil.Discard)
 
 	defer d.Close()
 	db.CreateSchema(d)
