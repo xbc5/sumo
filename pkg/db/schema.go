@@ -2,33 +2,44 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"log"
+	"strings"
 )
 
-type Feed struct {
-	db      *sql.DB
-	columns []string
+func logger(ok bool, name string, query string, err error) {
+	if ok {
+		log.Printf("Table created OK: %s", name)
+		return
+	}
+	if err != nil {
+		log.Fatalf("Table created ERROR: %s; %s", err, query)
+		return
+	}
+	if !ok {
+		log.Fatalf("Table created FALSE: %s", query)
+		return
+	}
 }
 
-func (this *Feed) create() (bool, error) {
-	statement, err := this.db.Prepare("CREATE TABLE IF NOT EXISTS Feed ()")
+func createTable(name string, db *sql.DB, columns []string) (bool, string, string, error) {
+	cols := strings.Join(columns, ", ")
+	query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s NULL);", name, cols)
+	statement, err := db.Prepare(query)
 
 	if err != nil {
-		return false, err
+		return false, name, query, err
 	}
 	_, err = statement.Exec()
 
 	if err != nil {
-		return false, err
+		return false, name, query, err
 	}
 
-	return true, nil
+	return true, name, query, nil
 }
 
-type Schema struct {
-	Feed Feed
-}
-
-func SchemaFactory(db *sql.DB) Schema {
+func CreateSchema(db *sql.DB) {
 	feedCols := []string{
 		"id INTEGER PRIMARY KEY",
 		"title VARCHAR(256)",
@@ -36,8 +47,6 @@ func SchemaFactory(db *sql.DB) Schema {
 		"url VARCHAR(2600)",
 		"language VARCHAR(10)",
 		"logo VARCHAR(2600)",
-		"NULL",
 	}
-	feed := Feed{db: db, columns: feedCols}
-	return Schema{Feed: feed}
+	logger(createTable("Feed", db, feedCols))
 }

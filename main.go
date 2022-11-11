@@ -5,7 +5,7 @@ import (
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
-	//"github.com/xbc5/sumo/pkg/db"
+	"github.com/xbc5/sumo/pkg/db"
 )
 
 func main() {
@@ -15,6 +15,7 @@ func main() {
 	}
 
 	defer d.Close()
+	db.CreateSchema(d)
 
 	//feed, _ := feed.Get("https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw")
 	//fmt.Println(*feed.Items[0].Title)
