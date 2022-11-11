@@ -64,4 +64,10 @@ func CreateSchema(db *sql.DB) {
 		"type VARCHAR(20)",
 	}
 	createTable("Attachment", db, attachmentCols)
+
+	authorCols := []string{
+		"id INTEGER PRIMARY KEY",
+		"name VARCHAR(50)",
+	}
+	createTable("Author", db, authorCols)
 }
