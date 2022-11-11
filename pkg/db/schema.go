@@ -13,15 +13,15 @@ func createTable(name string, db *sql.DB, columns []string) {
 
 	statement, err := db.Prepare(query)
 	if err != nil {
-		log.Fatalf("Table created ERROR: %s; %s", err, query)
+		log.Fatalf("Table creation ERROR %s -- %s", err, query)
 	}
 
 	_, err = statement.Exec()
 	if err != nil {
-		log.Fatalf("Table created ERROR: %s; %s", err, query)
+		log.Fatalf("Table creation ERROR %s -- %s", err, query)
 	}
 
-	log.Printf("Table created OK: %s", name)
+	log.Printf("Table creation OK: %s", name)
 }
 
 func CreateSchema(db *sql.DB) {
