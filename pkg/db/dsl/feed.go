@@ -5,12 +5,12 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (this *Dsl) UpsertFeedURL(url string) *Dsl {
+func (this *DSL) UpsertFeedURL(url string) *DSL {
 	record := db.Feed2{URL: url}
 	this.Conn = this.Conn.Clauses(
 		clause.OnConflict{DoNothing: true},
 	).Create(&record)
-  return this
+	return this
 }
 
 /* const upsertArticleQuery = `

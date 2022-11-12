@@ -2,6 +2,6 @@ package dsl
 
 import "gorm.io/gorm"
 
-type Dsl struct {
+type DSL struct {
 	Conn *gorm.DB
 }

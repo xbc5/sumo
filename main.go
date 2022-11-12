@@ -14,7 +14,7 @@ func main() {
 	db.AutoMigrate(conn)
 
 	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
-	_dsl := dsl.Dsl{Conn: conn}
+	_dsl := dsl.DSL{Conn: conn}
 	_dsl.UpsertFeedURL(feedUrl)
 
 	/* if err == nil {
