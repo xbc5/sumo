@@ -8,7 +8,7 @@ import (
 
 type Feed2 struct {
 	gorm.Model
-	Title       string `gorm:"not null"`
+	Title       string
 	Description string
 	URL         string `gorm:"not null;unique"`
 	language    string

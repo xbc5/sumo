@@ -20,11 +20,10 @@ func main() {
 	}
 	db.AutoMigrate(conn)
 
-	/* feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
-	feedTable := db.Feed{Db: d}
-	_, err := feedTable.InsertUrl(feedUrl)
+	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
+	db.AddFeedURL(conn, feedUrl)
 
-	if err == nil {
+	/* if err == nil {
 		urls, _ := feedTable.SelectUrls()
 		for _, url := range urls {
 			f, getErr := feed.Get(url)

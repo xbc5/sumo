@@ -1,26 +1,18 @@
 package db
 
 import (
-	"database/sql"
-
-	"github.com/xbc5/sumo/pkg/feed"
-	"github.com/xbc5/sumo/pkg/log"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
-type Feed struct {
-	Db *sql.DB
+func AddFeedURL(conn *gorm.DB, url string) *gorm.DB {
+	record := Feed2{URL: url}
+	return conn.Clauses(
+		clause.OnConflict{DoNothing: true},
+	).Create(&record)
 }
 
-func (this *Feed) InsertUrl(url string) (sql.Result, error) {
-	statement, err := this.Db.Prepare("INSERT OR IGNORE INTO Feed (url) VALUES (?)")
-	log.FeedQueryErr("Cannot prepare statement to insert URL into Feed", &url, err)
-	result, err := statement.Exec(url)
-	statement.Close()
-	log.FeedQueryErr("Cannot insert URL into Feed", &url, err)
-	return result, err
-}
-
-const upsertArticleQuery = `
+/* const upsertArticleQuery = `
 IF EXISTS (SELECT * FROM Article WITH (url) WHERE url = @url)
   BEGIN
     UPDATE table SET
@@ -70,6 +62,7 @@ func (this *Feed) UpdateFeed(url string, f *feed.Feed) (sql.Result, error) {
 	statement.Close()
 	log.FeedQueryErr("Cannot insert Feed", &url, err)
 	return result, err
+
 }
 
 func (this *Feed) SelectUrls() ([]string, error) {
@@ -81,4 +74,4 @@ func (this *Feed) SelectUrls() ([]string, error) {
 		urls = RowsToStrings(rows)
 	}
 	return urls, err
-}
+} */
