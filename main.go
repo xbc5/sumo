@@ -1,21 +1,23 @@
 package main
 
 import (
-	"fmt"
-
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/xbc5/sumo/pkg/db"
-	"github.com/xbc5/sumo/pkg/feed"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 func main() {
 	//log.SetOutput(ioutil.Discard)
 
-	connStr := "file:/tmp/sumo.db"
-	d, _ := db.Open(&connStr)
-	db.Create(d)
+	dsn := "file:/tmp/sumo.db"
+	conn, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	db.AutoMigrate(conn)
 
-	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
+	/* feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
 	feedTable := db.Feed{Db: d}
 	_, err := feedTable.InsertUrl(feedUrl)
 
@@ -31,5 +33,5 @@ func main() {
 		}
 	}
 
-	d.Close()
+	d.Close() */
 }

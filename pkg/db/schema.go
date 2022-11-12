@@ -1,111 +1,84 @@
 package db
 
 import (
-	"database/sql"
-	"fmt"
-	"strings"
-
-	"github.com/xbc5/sumo/pkg/log"
+	"gorm.io/gorm"
 )
 
-func createTable(name string, db *sql.DB, columns []string) {
-	cols := strings.Join(columns, ", ")
-	query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s);", name, cols)
+// maxUrl := 2083 // smallest value (MS edge)
 
-	statement, err := db.Prepare(query)
-	if err != nil {
-		log.SchemaFatal("Table creation ERROR", query, err)
-	}
-
-	_, err = statement.Exec()
-	if err != nil {
-		log.SchemaFatal("Table creation ERROR", query, err)
-	}
-
-	log.SchemaInfo("Table creation OK", name)
+type Feed2 struct {
+	gorm.Model
+	Title       string `gorm:"not null"`
+	Description string
+	URL         string `gorm:"not null;unique"`
+	language    string
+	logo        string
 }
 
-func Create(db *sql.DB) {
-	maxUrl := 2083 // smallest value (MS edge)
-	descLen := 512
-	titleLen := 256
+type Article struct {
+	gorm.Model
+	Title       string `gorm:"not null"`
+	Description string
+	Content     string
+	URL         string `gorm:"not null;unique"`
+	PublishedAt uint64 // TODO: if not provided, set to CreatedAt
+	ModifiedAt  uint64
+	Banner      string
+}
 
-	feedCols := []string{
-		"id INTEGER PRIMARY KEY",
-		fmt.Sprintf("title VARCHAR(%d)", titleLen),
-		fmt.Sprintf("description VARCHAR(%d)", descLen),
-		fmt.Sprintf("url VARCHAR(%d)", maxUrl),
-		"language VARCHAR(10)",
-		fmt.Sprintf("logo VARCHAR(%d)", maxUrl),
-		"UNIQUE(url)",
-	}
-	createTable("Feed", db, feedCols)
+type Attachment struct {
+	gorm.Model
+	URL    string `gorm:"not null;unique"`
+	Length uint16
+	Type   string
+}
 
-	articleCols := []string{
-		"id INTEGER PRIMARY KEY",
-		fmt.Sprintf("title VARCHAR(%d)", titleLen),
-		fmt.Sprintf("description VARCHAR(%d)", descLen),
-		"content VARCHAR(100000)", // FIXME: have truncated field if >100k
-		fmt.Sprintf("url VARCHAR(%d)", maxUrl),
-		"updated INTEGER",   // must be unix time
-		"published INTEGER", // integer is easier to do comparisons
-		fmt.Sprintf("banner VARCHAR(%d)", maxUrl),
-	}
-	createTable("Article", db, articleCols)
+type Tag struct {
+	gorm.Model
+	name string `gorm:"not null;unique"`
+}
 
-	tagCols := []string{
-		"id INTEGER PRIMARY KEY",
-		"name VARCHAR(20)",
-	}
-	createTable("Tag", db, tagCols)
+type Author struct {
+	gorm.Model
+	// unique because there no other distinguishing attributes,
+	// and we will end up with duplicates
+	name string `gorm:"not null;unique"`
+}
 
-	attachmentCols := []string{
-		"id INTEGER PRIMARY KEY",
-		fmt.Sprintf("url VARCHAR(%d)", maxUrl),
-		"length INTEGER",
-		"type VARCHAR(20)",
-	}
-	createTable("Attachment", db, attachmentCols)
+// bridge tables
+type ArticleTag struct {
+	ArticleID uint `gorm:"primaryKey;autoIncrement:false"`
+	TagID     uint `gorm:"primaryKey;autoIncrement:false"`
+}
 
-	authorCols := []string{
-		"id INTEGER PRIMARY KEY",
-		"name VARCHAR(50)",
-	}
-	createTable("Author", db, authorCols)
+type ArticleAttachment struct {
+	ArticleID    uint `gorm:"primaryKey;autoIncrement:false"`
+	AttachmentID uint `gorm:"primaryKey;autoIncrement:false"`
+}
 
-	// bridge tables
-	articleTagCols := []string{
-		"article_id INTEGER",
-		"tag_id INTEGER",
-		"CONSTRAINT con_primary_name PRIMARY KEY (article_id,tag_id)",
-	}
-	createTable("ArticleTag", db, articleTagCols)
+type ArticleAuthor struct {
+	ArticleID uint `gorm:"primaryKey;autoIncrement:false"`
+	AuthorID  uint `gorm:"primaryKey;autoIncrement:false"`
+}
 
-	articleAttachmentCols := []string{
-		"article_id INTEGER",
-		"attachment_id INTEGER",
-		"CONSTRAINT con_primary_name PRIMARY KEY (article_id,attachment_id)",
-	}
-	createTable("ArticleAttachment", db, articleAttachmentCols)
+type FeedTag struct {
+	FeedID uint `gorm:"primaryKey;autoIncrement:false"`
+	TagID  uint `gorm:"primaryKey;autoIncrement:false"`
+}
 
-	articleAuthorCols := []string{
-		"article_id INTEGER",
-		"author_id INTEGER",
-		"CONSTRAINT con_primary_name PRIMARY KEY (article_id,author_id)",
-	}
-	createTable("ArticleAuthor", db, articleAuthorCols)
+type FeedArticle struct {
+	FeedID    uint `gorm:"primaryKey;autoIncrement:false"`
+	ArticleID uint `gorm:"primaryKey;autoIncrement:false"`
+}
 
-	feedTagCols := []string{
-		"feed_id INTEGER",
-		"tag_id INTEGER",
-		"CONSTRAINT con_primary_name PRIMARY KEY (feed_id,tag_id)",
-	}
-	createTable("FeedTag", db, feedTagCols)
-
-	feedArticle := []string{
-		"feed_id INTEGER",
-		"article_id INTEGER",
-		"CONSTRAINT con_primary_name PRIMARY KEY (feed_id,article_id)",
-	}
-	createTable("FeedArticle", db, feedArticle)
+func AutoMigrate(conn *gorm.DB) {
+	conn.AutoMigrate(&Feed2{})
+	conn.AutoMigrate(&Article{})
+	conn.AutoMigrate(&Author{})
+	conn.AutoMigrate(&Attachment{})
+	conn.AutoMigrate(&ArticleTag{})
+	conn.AutoMigrate(&ArticleAttachment{})
+	conn.AutoMigrate(&ArticleAuthor{})
+	conn.AutoMigrate(&FeedTag{})
+	conn.AutoMigrate(&FeedArticle{})
 }
