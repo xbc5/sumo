@@ -17,9 +17,13 @@ func QueryError(msg string, err error) {
 	}
 }
 
-func FeedQueryErr(msg string, url string, err error) {
+func FeedQueryErr(msg string, url *string, err error) {
 	if err != nil {
-		log.Logger.Err(err).Str("kind", "query").Str("table", "Feed").Str("url", url).Msg(msg)
+		l := log.Logger.Err(err).Str("kind", "query").Str("table", "Feed")
+		if url != nil {
+			l.Str("url", *url)
+		}
+		l.Msg(msg)
 	}
 }
 
