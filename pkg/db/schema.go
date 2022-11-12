@@ -37,6 +37,7 @@ func Create(db *sql.DB) {
 		fmt.Sprintf("url VARCHAR(%d)", maxUrl),
 		"language VARCHAR(10)",
 		fmt.Sprintf("logo VARCHAR(%d)", maxUrl),
+		"UNIQUE(url)",
 	}
 	createTable("Feed", db, feedCols)
 
