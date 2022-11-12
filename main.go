@@ -3,7 +3,7 @@ package main
 import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/xbc5/sumo/pkg/db"
-	"github.com/xbc5/sumo/pkg/dsl"
+	"github.com/xbc5/sumo/pkg/db/dsl"
 )
 
 func main() {
