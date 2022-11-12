@@ -22,14 +22,9 @@ func (this *Feed) SelectUrls() ([]string, error) {
 	rows, err := this.Db.Query("SELECT (url) FROM Feed")
 	log.QueryError("Cannot SELECT(url) from Table(Feed)", err)
 
-	urls := make([]string, 0)
+	var urls []string
 	if err == nil {
-		for rows.Next() {
-			var url string
-			err := rows.Scan(&url)
-			log.QueryError("Cannot SCAN row", err)
-			urls = append(urls, url)
-		}
+		urls = RowsToStrings(rows)
 	}
 	return urls, err
 }
