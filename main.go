@@ -21,8 +21,11 @@ func main() {
 	if err == nil {
 		urls, _ := feedTable.SelectUrls()
 		for _, url := range urls {
-			f, _ := feed.Get(url)
-			fmt.Println(*f.Title)
+			f, getErr := feed.Get(url)
+			if getErr != nil {
+				feedTable.InsertFeed(url, f)
+				fmt.Println(*f.Title)
+			}
 		}
 	}
 

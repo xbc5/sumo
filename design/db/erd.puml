@@ -6,7 +6,6 @@ entity Feed {
   title
   description
   url
-  items
   language
   logo
 }

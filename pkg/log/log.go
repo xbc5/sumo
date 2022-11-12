@@ -19,6 +19,22 @@ func QueryError(msg string, err error) bool {
 	return false
 }
 
+func FeedQueryErr(msg string, url string, err error) bool {
+	if err != nil {
+		log.Logger.Err(err).Str("kind", "query").Str("table", "Feed").Str("url", url).Msg(msg)
+		return true
+	}
+	return false
+}
+
+func FeedGetErr(url string, err error) bool {
+	if err != nil {
+		log.Logger.Err(err).Str("kind", "fetch").Str("url", url).Msg("Error fetching feed")
+		return true
+	}
+	return false
+}
+
 func SchemaFatal(msg string, query string, err error) bool {
 	if err != nil {
 		log.Logger.Fatal().AnErr("error", err).Str("kind", "schema").Str("query", query).Msg(msg)

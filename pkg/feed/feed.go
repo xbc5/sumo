@@ -2,6 +2,7 @@ package feed
 
 import (
 	"github.com/mmcdole/gofeed"
+	"github.com/xbc5/sumo/pkg/log"
 )
 
 type Image struct {
@@ -106,6 +107,7 @@ func makeItems(theirs []*gofeed.Item) []*Item {
 func Get(url string) (*Feed, error) {
 	fp := gofeed.NewParser()
 	theirFeed, err := fp.ParseURL(url)
+	log.FeedGetErr(url, err)
 	ourFeed := makeFeed(theirFeed)
 	ourItems := makeItems(theirFeed.Items)
 	ourFeed.Items = ourItems
