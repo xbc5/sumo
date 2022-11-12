@@ -5,13 +5,16 @@ import (
 	"github.com/xbc5/sumo/pkg/db"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
 	//log.SetOutput(ioutil.Discard)
 
 	dsn := "file:/tmp/sumo.db"
-	conn, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+	conn, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		panic("failed to connect database")
 	}
