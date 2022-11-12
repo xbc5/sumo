@@ -1,37 +1,29 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/xbc5/sumo/pkg/db/connection"
 	"github.com/xbc5/sumo/pkg/db/feed"
 	"github.com/xbc5/sumo/pkg/db/schema"
-	"github.com/xbc5/sumo/pkg/db/util"
 )
 
 func main() {
-	d, err := sql.Open("sqlite3", ":memory:")
-	if err != nil {
-		log.Fatal(err)
-	}
 	//log.SetOutput(ioutil.Discard)
 
-	schema.Create(d)
+	db, _ := connection.Open()
+	schema.Create(db)
 
 	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
-	rows, err := feed.InsertUrl(d, feedUrl)
-
-	urls := util.RowsToStrings(rows)
-	log.Printf("THIS %s", urls)
+	_, err := feed.InsertUrl(db, feedUrl)
 
 	if err == nil {
-		result, _ := feed.SelectUrls(d)
+		result, _ := feed.SelectUrls(db)
 		fmt.Printf("Inserted %s", result)
 	}
 
-	d.Close()
+	db.Close()
 	//feed, _ := feed.Get("https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw")
 	//fmt.Println(*feed.Items[0].Title)
 }

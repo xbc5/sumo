@@ -18,3 +18,11 @@ func QueryError(msg string, err error) bool {
 	}
 	return false
 }
+
+func DbConnErr(msg string, err error) bool {
+	if err != nil {
+		log.Logger.Err(err).Str("kind", "connection").Msg(msg)
+		return true
+	}
+	return false
+}
