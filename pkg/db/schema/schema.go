@@ -3,8 +3,9 @@ package schema
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"strings"
+
+	"github.com/xbc5/sumo/pkg/log"
 )
 
 func createTable(name string, db *sql.DB, columns []string) {
@@ -13,15 +14,15 @@ func createTable(name string, db *sql.DB, columns []string) {
 
 	statement, err := db.Prepare(query)
 	if err != nil {
-		log.Fatalf("Table creation ERROR %s -- %s", err, query)
+		log.SchemaFatal("Table creation ERROR", query, err)
 	}
 
 	_, err = statement.Exec()
 	if err != nil {
-		log.Fatalf("Table creation ERROR %s -- %s", err, query)
+		log.SchemaFatal("Table creation ERROR", query, err)
 	}
 
-	log.Printf("Table creation OK: %s", name)
+	log.SchemaInfo("Table creation OK", name)
 }
 
 func Create(db *sql.DB) {

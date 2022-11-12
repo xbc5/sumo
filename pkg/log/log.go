@@ -19,6 +19,19 @@ func QueryError(msg string, err error) bool {
 	return false
 }
 
+func SchemaFatal(msg string, query string, err error) bool {
+	if err != nil {
+		log.Logger.Fatal().AnErr("error", err).Str("kind", "schema").Str("query", query).Msg(msg)
+		return true
+	}
+	return false
+}
+
+func SchemaInfo(msg string, tableName string) bool {
+	log.Logger.Info().Str("kind", "schema").Str("table", tableName).Msg(msg)
+	return true
+}
+
 func DbConnErr(msg string, err error) bool {
 	if err != nil {
 		log.Logger.Err(err).Str("kind", "connection").Msg(msg)
