@@ -13,10 +13,10 @@ type Feed struct {
 
 func (this *Feed) InsertUrl(url string) (sql.Result, error) {
 	statement, err := this.Db.Prepare("INSERT OR IGNORE INTO Feed (url) VALUES (?)")
-	log.QueryError("Cannot prepare statement to insert URL into Feed", err)
+	log.FeedQueryErr("Cannot prepare statement to insert URL into Feed", url, err)
 	result, err := statement.Exec(url)
 	statement.Close()
-	log.QueryError("Cannot insert URL into Feed", err)
+	log.FeedQueryErr("Cannot insert URL into Feed", url, err)
 	return result, err
 }
 
