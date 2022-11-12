@@ -3,7 +3,7 @@ package main
 import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/xbc5/sumo/pkg/db"
-	"github.com/xbc5/sumo/pkg/db/dsl"
+	"github.com/xbc5/sumo/pkg/dsl"
 )
 
 func main() {
@@ -14,7 +14,8 @@ func main() {
 	db.AutoMigrate(conn)
 
 	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
-	dsl.UpsertFeedURL(conn, feedUrl)
+	_dsl := dsl.Dsl{Conn: conn}
+	_dsl.UpsertFeedURL(feedUrl)
 
 	/* if err == nil {
 		urls, _ := feedTable.SelectUrls()

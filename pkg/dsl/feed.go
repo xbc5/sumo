@@ -2,15 +2,15 @@ package dsl
 
 import (
 	"github.com/xbc5/sumo/pkg/db"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
-func UpsertFeedURL(conn *gorm.DB, url string) *gorm.DB {
+func (this *Dsl) UpsertFeedURL(url string) *Dsl {
 	record := db.Feed2{URL: url}
-	return conn.Clauses(
+	this.Conn = this.Conn.Clauses(
 		clause.OnConflict{DoNothing: true},
 	).Create(&record)
+  return this
 }
 
 /* const upsertArticleQuery = `
