@@ -11,7 +11,7 @@ func Open() (*sql.DB, error) {
 	// you MUST close it before the next query: rows.Close()
 	// this is fine, since memory is only for testing.
 	// see:
-	db, err := sql.Open("sqlite3", "file:/tmp/foo.db")
+	db, err := sql.Open("sqlite3", ":memory:")
 	log.DbConnErr("Cannot connect to in-memory database", err)
 	return db, err
 }

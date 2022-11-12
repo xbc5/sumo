@@ -6,9 +6,11 @@ import (
 	"github.com/xbc5/sumo/pkg/log"
 )
 
-func InsertUrl(db *sql.DB, url string) (*sql.Rows, error) {
-	result, err := db.Query("INSERT INTO Feed (url) VALUES (?)", url)
-	log.QueryError("Cannot INSERT(url) into Feed", err)
+func InsertUrl(db *sql.DB, url string) (sql.Result, error) {
+	statement, err := db.Prepare("INSERT INTO Feed (url) VALUES (?)")
+	log.QueryError("Cannot prepare statement to insert URL into Feed", err)
+	result, err := statement.Exec(url)
+	log.QueryError("Cannot insert URL into Feed", err)
 	return result, err
 }
 
@@ -27,4 +29,3 @@ func SelectUrls(db *sql.DB) ([]string, error) {
 	}
 	return urls, err
 }
-
