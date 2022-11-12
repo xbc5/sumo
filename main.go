@@ -11,7 +11,8 @@ import (
 func main() {
 	//log.SetOutput(ioutil.Discard)
 
-	d, _ := db.Open()
+	connStr := "file:/tmp/sumo.db"
+	d, _ := db.Open(&connStr)
 	db.Create(d)
 
 	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
@@ -22,9 +23,10 @@ func main() {
 		urls, _ := feedTable.SelectUrls()
 		for _, url := range urls {
 			f, getErr := feed.Get(url)
-			if getErr != nil {
-				feedTable.InsertFeed(url, f)
-				fmt.Println(*f.Title)
+			if getErr == nil {
+				result, _ := feedTable.UpdateFeed(url, f)
+				affected, _ := result.RowsAffected()
+				fmt.Printf("rows affected: %s", affected)
 			}
 		}
 	}
