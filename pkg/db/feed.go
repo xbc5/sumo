@@ -12,7 +12,7 @@ type Feed struct {
 }
 
 func (this *Feed) InsertUrl(url string) (sql.Result, error) {
-	statement, err := this.Db.Prepare("INSERT INTO Feed (url) VALUES (?)")
+	statement, err := this.Db.Prepare("INSERT OR IGNORE INTO Feed (url) VALUES (?)")
 	log.QueryError("Cannot prepare statement to insert URL into Feed", err)
 	result, err := statement.Exec(url)
 	log.QueryError("Cannot insert URL into Feed", err)
