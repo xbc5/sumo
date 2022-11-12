@@ -5,6 +5,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/xbc5/sumo/pkg/db"
+	"github.com/xbc5/sumo/pkg/feed"
 )
 
 func main() {
@@ -18,11 +19,12 @@ func main() {
 	_, err := feedTable.InsertUrl(feedUrl)
 
 	if err == nil {
-		result, _ := feedTable.SelectUrls()
-		fmt.Printf("Inserted %s", result)
+		urls, _ := feedTable.SelectUrls()
+		for _, url := range urls {
+			f, _ := feed.Get(url)
+			fmt.Println(*f.Title)
+		}
 	}
 
 	d.Close()
-	//feed, _ := feed.Get("https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw")
-	//fmt.Println(*feed.Items[0].Title)
 }
