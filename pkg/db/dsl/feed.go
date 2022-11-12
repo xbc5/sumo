@@ -13,6 +13,12 @@ func (this *DSL) UpsertFeedURL(url string) *DSL {
 	return this
 }
 
+func (this *DSL) SelectFeedURLs() *DSL {
+	record := db.Feed2{}
+	this.Conn = this.Conn.Select("url").Find(&record)
+	return this
+}
+
 /* const upsertArticleQuery = `
 IF EXISTS (SELECT * FROM Article WITH (url) WHERE url = @url)
   BEGIN
@@ -64,8 +70,3 @@ func (this *Feed) UpdateFeed(url string, f *feed.Feed) (sql.Result, error) {
 	log.FeedQueryErr("Cannot insert Feed", &url, err)
 	return result, err
 }*/
-
-/* func GetFeedURLs(conn *gorm.DB) ([]string, error) {
-	record := db.Feed2{}
-	foo := conn.Select("url").Find(&record)
-} */
