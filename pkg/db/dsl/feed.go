@@ -1,12 +1,13 @@
-package db
+package dsl
 
 import (
+	"github.com/xbc5/sumo/pkg/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
-func AddFeedURL(conn *gorm.DB, url string) *gorm.DB {
-	record := Feed2{URL: url}
+func UpsertFeedURL(conn *gorm.DB, url string) *gorm.DB {
+	record := db.Feed2{URL: url}
 	return conn.Clauses(
 		clause.OnConflict{DoNothing: true},
 	).Create(&record)
@@ -62,16 +63,9 @@ func (this *Feed) UpdateFeed(url string, f *feed.Feed) (sql.Result, error) {
 	statement.Close()
 	log.FeedQueryErr("Cannot insert Feed", &url, err)
 	return result, err
+}*/
 
-}
-
-func (this *Feed) SelectUrls() ([]string, error) {
-	rows, err := this.Db.Query("SELECT (url) FROM Feed")
-	log.FeedQueryErr("Cannot SELECT(url) from Table(Feed)", nil, err)
-
-	var urls []string
-	if err == nil {
-		urls = RowsToStrings(rows)
-	}
-	return urls, err
+/* func GetFeedURLs(conn *gorm.DB) ([]string, error) {
+	record := db.Feed2{}
+	foo := conn.Select("url").Find(&record)
 } */
