@@ -56,7 +56,7 @@ func makeFeed(theirs *gofeed.Feed) *Feed {
 	return ours
 }
 
-func makeItem(theirs *gofeed.Item) Article {
+func makeArticle(theirs *gofeed.Item) Article {
 	var banner string
 	if theirs.Image != nil {
 		banner = theirs.Image.URL
@@ -103,21 +103,21 @@ func makeItem(theirs *gofeed.Item) Article {
 	return ours
 }
 
-func makeItems(theirs []*gofeed.Item) []*Article {
+func makeArticles(theirs []*gofeed.Item) []*Article {
 	var result = make([]*Article, len(theirs))
 	for i := 0; i < len(theirs); i++ {
-		result[i] = makeItem(theirs[i])
+		result[i] = makeArticle(theirs[i])
 	}
 	return result
 }
 
 func Get(url string) (Feed, error) {
 	fp := gofeed.NewParser()
-	theirFeed, err := fp.ParseURL(url)
+	src, err := fp.ParseURL(url)
 	log.FeedGetErr(url, err)
-	ourFeed := makeFeed(theirFeed)
-	ourItems := makeItems(theirFeed.Items)
-	ourFeed.Items = ourItems
+	feed := makeFeed(src)
+	articles := makeArticles(src.Items)
+	feed.Items = articles
 
-	return *ourFeed, err // FIXME: don't use pointers
+	return *feed, err // FIXME: don't use pointers
 }
