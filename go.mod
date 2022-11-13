@@ -1,11 +1,13 @@
 module github.com/xbc5/sumo
 
-go 1.17
+go 1.19
 
 require (
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/mmcdole/gofeed v1.1.3
 	github.com/rs/zerolog v1.28.0
+	gorm.io/driver/sqlite v1.4.3
+	gorm.io/gorm v1.24.1
 )
 
 require (
@@ -22,6 +24,4 @@ require (
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	gorm.io/driver/sqlite v1.4.3 // indirect
-	gorm.io/gorm v1.24.1 // indirect
 )
