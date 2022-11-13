@@ -2,21 +2,17 @@ package main
 
 import (
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/xbc5/sumo/pkg/db"
-	"github.com/xbc5/sumo/pkg/db/dsl"
-	"github.com/xbc5/sumo/pkg/db/model"
+	"github.com/xbc5/sumo/pkg/database"
 )
 
 func main() {
 	//log.SetOutput(ioutil.Discard)
 
-	dsn := "file:/tmp/sumo.db"
-	conn := db.Open(&dsn)
-	model.AutoMigrate(conn)
+	db := database.DB{}
+	db.Open().AutoMigrate()
 
 	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
-	_dsl := dsl.DSL{Conn: conn}
-	_dsl.UpsertFeedURL(feedUrl)
+	db.UpsertFeedURL(feedUrl)
 
 	/* if err == nil {
 		urls, _ := feedTable.SelectUrls()

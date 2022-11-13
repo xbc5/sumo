@@ -1,34 +1,33 @@
-package dsl
+package database
 
 import (
-	"github.com/xbc5/sumo/pkg/db/model"
 	"github.com/xbc5/sumo/pkg/feed"
 	"gorm.io/gorm/clause"
 )
 
-func (this *DSL) UpsertFeedURL(url string) *DSL {
-	record := model.Feed2{URL: url}
-	this.Conn = this.Conn.Clauses(
+func (this *DB) UpsertFeedURL(url string) *DB {
+	record := Feed2{URL: url}
+	this.Conn.Clauses(
 		clause.OnConflict{DoNothing: true},
 	).Create(&record)
 	return this
 }
 
-func (this *DSL) SelectFeedURLs() *DSL {
-	record := model.Feed2{}
-	this.Conn = this.Conn.Select("url").Find(&record)
+func (this *DB) SelectFeedURLs() *DB {
+	record := Feed2{}
+	this.Conn.Select("url").Find(&record)
 	return this
 }
 
-func (this *DSL) UpdateFeed(f *feed.Feed) *DSL {
-	record := model.Feed2{
+func (this *DB) UpdateFeed(f *feed.Feed) *DB {
+	record := Feed2{
 		URL:         f.FeedLink,
 		Title:       f.Title,
 		Description: f.Description,
 		Language:    f.Language,
 		Logo:        f.Logo.URL,
 	}
-	this.Conn = this.Conn.Model(&model.Feed2{}).Where("url = ?", f.FeedLink).Updates(&record)
+	this.Conn.Model(&Feed2{}).Where("url = ?", f.FeedLink).Updates(&record)
 	return this
 }
 

@@ -1,4 +1,4 @@
-package model
+package database
 
 import (
 	"gorm.io/gorm"
@@ -71,14 +71,15 @@ type FeedArticle struct {
 	ArticleID uint `gorm:"primaryKey;autoIncrement:false"`
 }
 
-func AutoMigrate(conn *gorm.DB) {
-	conn.AutoMigrate(&Feed2{})
-	conn.AutoMigrate(&Article{})
-	conn.AutoMigrate(&Author{})
-	conn.AutoMigrate(&Attachment{})
-	conn.AutoMigrate(&ArticleTag{})
-	conn.AutoMigrate(&ArticleAttachment{})
-	conn.AutoMigrate(&ArticleAuthor{})
-	conn.AutoMigrate(&FeedTag{})
-	conn.AutoMigrate(&FeedArticle{})
+func (this *DB) AutoMigrate() *DB {
+	this.Conn.AutoMigrate(&Feed2{})
+	this.Conn.AutoMigrate(&Article{})
+	this.Conn.AutoMigrate(&Author{})
+	this.Conn.AutoMigrate(&Attachment{})
+	this.Conn.AutoMigrate(&ArticleTag{})
+	this.Conn.AutoMigrate(&ArticleAttachment{})
+	this.Conn.AutoMigrate(&ArticleAuthor{})
+	this.Conn.AutoMigrate(&FeedTag{})
+	this.Conn.AutoMigrate(&FeedArticle{})
+	return this
 }
