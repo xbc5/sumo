@@ -18,7 +18,7 @@ func main() {
 	for _, url := range db.GetFeedURLs() {
 		feed, err := feed.Get(url)
 		if err == nil {
-			db.UpdateFeed(feed)
+			db.UpdateFeed(url, feed)
 		}
 	}
 

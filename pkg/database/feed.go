@@ -19,7 +19,7 @@ func (this *DB) GetFeedURLs() []string {
 	return ToFeedUrls(&feeds)
 }
 
-func (this *DB) UpdateFeed(f feed.Feed) *DB {
+func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
 	record := Feed2{
 		URL:         f.FeedLink,
 		Title:       f.Title,
@@ -27,7 +27,10 @@ func (this *DB) UpdateFeed(f feed.Feed) *DB {
 		Language:    f.Language,
 		Logo:        f.Logo.URL,
 	}
-	this.Conn.Model(&Feed2{}).Where("url = ?", f.FeedLink).Updates(&record)
+	this.Conn.Model(&Feed2{}).
+		Select("Title", "Description", "Language", "Logo").
+		Where("url = ?", url).
+		Updates(&record)
 	return this
 }
 
