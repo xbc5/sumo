@@ -58,26 +58,3 @@ func (this *DB) AddArticles(articles *[]*feed.Item) *DB {
 	}
 	return this
 }
-
-/* const upsertArticleQuery = `
-IF EXISTS (SELECT * FROM Article WITH (url) WHERE url = @url)
-  BEGIN
-    UPDATE table SET
-      title = @title,
-      description = @description,
-      content = @content,
-      udated = @updated,
-      published = @published,
-      banner = @banner
-    WHERE url = @url
-  END
-ELSE
-  BEGIN
-    INSERT INTO TABLE  ( url,  title,  description,  content,  updated,  published,  banner)
-                VALUES (@url, @title, @description, @content, @updated, @published, @banner)
-  END
-`
-
-
-
-*/
