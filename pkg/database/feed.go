@@ -34,6 +34,31 @@ func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
 	return this
 }
 
+func (this *DB) AddArticle(art *feed.Item) *DB {
+	record := Article{
+		URL:         art.Link,
+		Title:       art.Title,
+		Description: art.Description,
+		Content:     art.Content,
+	}
+
+	this.Conn.Clauses(
+		clause.OnConflict{
+			DoUpdates: clause.AssignmentColumns(
+				[]string{"Title", "Description", "Content"},
+			)},
+	).Create(&record)
+
+	return this
+}
+
+func (this *DB) AddArticles(articles *[]*feed.Item) *DB {
+	for _, article := range *articles {
+		this.AddArticle(article)
+	}
+	return this
+}
+
 /* const upsertArticleQuery = `
 IF EXISTS (SELECT * FROM Article WITH (url) WHERE url = @url)
   BEGIN
@@ -53,25 +78,6 @@ ELSE
   END
 `
 
-func (this *Feed) UpsertArticle(art *feed.Item) error {
-	tx, txErr := this.Db.Begin()
-	log.FeedQueryErr("Cannot begin TX in UpsertArticle()", nil, txErr)
-	stmt, stmtErr := tx.Prepare(upsertArticleQuery)
-	log.FeedQueryErr("Cannot prepare statement in UpsertArticle()", nil, stmtErr)
-	_, execErr := stmt.Exec(
-		sql.Named("url", art.Link),
-		sql.Named("title", art.Title),
-		sql.Named("description", art.Description),
-		sql.Named("content", art.Content),
-		sql.Named("updated", art.Updated),
-		sql.Named("published", art.Published),
-		sql.Named("banner", art.Banner.URL),
-	)
-	stmt.Close() // FIXME handle error
-	log.FeedQueryErr("Cannot execute statement in UpsertArticle()", nil, execErr)
-	tx.Commit()
-	return execErr
-}
 
 
 */
