@@ -13,7 +13,8 @@ type Feed struct {
 	URL         string `gorm:"not null;unique"`
 	Language    string
 	Logo        string
-	Tags        []Tag `gorm:"many2many:feed_tags"`
+	Tags        []Tag     `gorm:"many2many:feed_tags"`
+	Articles    []Article // one-to-many; uses FeedID as FK by default
 }
 
 type Article struct {
@@ -25,15 +26,18 @@ type Article struct {
 	PublishedAt uint64 // TODO: if not provided, set to CreatedAt
 	ModifiedAt  uint64
 	Banner      string
-	Tags        []Tag    `gorm:"many2many:article_tags"`
-	Authors     []Author `gorm:"many2many:article_authors"`
+	Tags        []Tag        `gorm:"many2many:article_tags"`
+	Authors     []Author     `gorm:"many2many:article_authors"`
+	Attachments []Attachment // uses ArticleID as FK by default
+	FeedID      uint         // FK
 }
 
 type Attachment struct {
 	gorm.Model
-	URL    string `gorm:"not null;unique"`
-	Length uint16
-	Type   string
+	URL       string `gorm:"not null;unique"`
+	Length    uint64 // 1GB is 8589934592 bits (size units) @ 34 bits (binary length)
+	Type      string
+	ArticleID uint // FK
 }
 
 type Tag struct {
