@@ -11,18 +11,18 @@ type Attachment struct {
 	Type   string
 }
 
-type Item struct {
+type Article struct {
 	Title       string
 	Description string
 	Content     string
-	Link        string
-	Updated     string
+	URL         string
+	Modified    string
 	Published   string
 	Author      string
 	Authors     []string
 	GUID        string
 	Banner      string
-	Categories  []string
+	Tags        []string
 	Attachments []Attachment
 }
 
@@ -31,7 +31,7 @@ type Feed struct {
 	Description string
 	FeedLink    string
 	Links       []string
-	Items       []*Item
+	Items       []*Article
 	Language    string
 	Logo        string
 	Categories  []string
@@ -56,8 +56,7 @@ func makeFeed(theirs *gofeed.Feed) *Feed {
 	return ours
 }
 
-func makeItem(theirs *gofeed.Item) Item {
-
+func makeItem(theirs *gofeed.Item) Article {
 	var banner string
 	if theirs.Image != nil {
 		banner = theirs.Image.URL
@@ -86,26 +85,26 @@ func makeItem(theirs *gofeed.Item) Item {
 		}
 	}
 
-	ours := Item{
-		Link:        theirs.Link,
+	ours := Article{
+		URL:         theirs.Link,
 		Title:       theirs.Title,
 		Description: theirs.Description,
 		Content:     theirs.Content,
-		Updated:     theirs.Updated,
+		Modified:    theirs.Updated,
 		Published:   theirs.Published,
 		Banner:      banner,
 		Author:      author,
 		Authors:     authors,
 		Attachments: attachments,
 		GUID:        theirs.GUID,
-		Categories:  theirs.Categories,
+		Tags:        theirs.Categories,
 	}
 
 	return ours
 }
 
-func makeItems(theirs []*gofeed.Item) []*Item {
-	var result = make([]*Item, len(theirs))
+func makeItems(theirs []*gofeed.Item) []*Article {
+	var result = make([]*Article, len(theirs))
 	for i := 0; i < len(theirs); i++ {
 		result[i] = makeItem(theirs[i])
 	}

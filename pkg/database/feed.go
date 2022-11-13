@@ -34,9 +34,9 @@ func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
 	return this
 }
 
-func (this *DB) AddArticle(art *feed.Item) *DB {
+func (this *DB) AddArticle(art *feed.Article) *DB {
 	record := Article{
-		URL:         art.Link,
+		URL:         art.URL,
 		Title:       art.Title,
 		Description: art.Description,
 		Content:     art.Content,
@@ -53,7 +53,7 @@ func (this *DB) AddArticle(art *feed.Item) *DB {
 	return this
 }
 
-func (this *DB) AddArticles(articles *[]*feed.Item) *DB {
+func (this *DB) AddArticles(articles *[]*feed.Article) *DB {
 	for _, article := range *articles {
 		this.AddArticle(article)
 	}
