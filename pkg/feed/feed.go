@@ -64,11 +64,22 @@ func makeFeed(theirs *gofeed.Feed) *Feed {
 func makeItem(theirs *gofeed.Item) *Item {
 	ours := new(Item)
 
+	ourImg := new(Image)
 	if theirs.Image != nil {
-		ourImg := new(Image)
 		ourImg.Title = theirs.Image.Title
 		ourImg.URL = theirs.Image.URL
 		ours.Banner = ourImg
+	}
+
+	if theirs.Author != nil {
+		ours.Author = theirs.Author.Name
+	}
+
+	if theirs.Authors != nil {
+		ours.Authors = make([]string, len(theirs.Authors))
+		for i := 0; i < len(theirs.Authors); i++ {
+			ours.Authors[i] = theirs.Authors[i].Name
+		}
 	}
 
 	ours.Title = theirs.Title
@@ -77,14 +88,8 @@ func makeItem(theirs *gofeed.Item) *Item {
 	ours.Link = theirs.Link
 	ours.Updated = theirs.Updated
 	ours.Published = theirs.Published
-	ours.Author = theirs.Author.Name
 	ours.GUID = theirs.GUID
 	ours.Categories = theirs.Categories
-
-	ours.Authors = make([]string, len(theirs.Authors))
-	for i := 0; i < len(theirs.Authors); i++ {
-		ours.Authors[i] = theirs.Authors[i].Name
-	}
 
 	ours.Attachments = make([]*Attachment, len(theirs.Enclosures))
 	for i := 0; i < len(theirs.Enclosures); i++ {
@@ -104,7 +109,7 @@ func makeItems(theirs []*gofeed.Item) []*Item {
 	return result
 }
 
-func Get(url string) (*Feed, error) {
+func Get(url string) (Feed, error) {
 	fp := gofeed.NewParser()
 	theirFeed, err := fp.ParseURL(url)
 	log.FeedGetErr(url, err)
@@ -112,5 +117,5 @@ func Get(url string) (*Feed, error) {
 	ourItems := makeItems(theirFeed.Items)
 	ourFeed.Items = ourItems
 
-	return ourFeed, err
+	return *ourFeed, err // FIXME: don't use pointers
 }
