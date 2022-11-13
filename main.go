@@ -12,7 +12,7 @@ func main() {
 	db.Open().AutoMigrate()
 
 	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
-	db.UpsertFeedURL(feedUrl)
+	db.AddFeedURL(feedUrl)
 
 	/* if err == nil {
 		urls, _ := feedTable.SelectUrls()

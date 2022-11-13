@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (this *DB) UpsertFeedURL(url string) *DB {
+func (this *DB) AddFeedURL(url string) *DB {
 	record := Feed2{URL: url}
 	this.Conn.Clauses(
 		clause.OnConflict{DoNothing: true},
@@ -13,7 +13,7 @@ func (this *DB) UpsertFeedURL(url string) *DB {
 	return this
 }
 
-func (this *DB) SelectFeedURLs() *DB {
+func (this *DB) GetFeedURLs() *DB {
 	record := Feed2{}
 	this.Conn.Select("url").Find(&record)
 	return this
