@@ -13,6 +13,7 @@ type Feed struct {
 	URL         string `gorm:"not null;unique"`
 	Language    string
 	Logo        string
+	Tags        []Tag `gorm:"many2many:feed_tags"`
 }
 
 type Article struct {
@@ -24,6 +25,8 @@ type Article struct {
 	PublishedAt uint64 // TODO: if not provided, set to CreatedAt
 	ModifiedAt  uint64
 	Banner      string
+	Tags        []Tag    `gorm:"many2many:article_tags"`
+	Authors     []Author `gorm:"many2many:article_authors"`
 }
 
 type Attachment struct {
@@ -45,41 +48,10 @@ type Author struct {
 	name string `gorm:"not null;unique"`
 }
 
-// bridge tables
-type ArticleTag struct {
-	ArticleID uint `gorm:"primaryKey;autoIncrement:false"`
-	TagID     uint `gorm:"primaryKey;autoIncrement:false"`
-}
-
-type ArticleAttachment struct {
-	ArticleID    uint `gorm:"primaryKey;autoIncrement:false"`
-	AttachmentID uint `gorm:"primaryKey;autoIncrement:false"`
-}
-
-type ArticleAuthor struct {
-	ArticleID uint `gorm:"primaryKey;autoIncrement:false"`
-	AuthorID  uint `gorm:"primaryKey;autoIncrement:false"`
-}
-
-type FeedTag struct {
-	FeedID uint `gorm:"primaryKey;autoIncrement:false"`
-	TagID  uint `gorm:"primaryKey;autoIncrement:false"`
-}
-
-type FeedArticle struct {
-	FeedID    uint `gorm:"primaryKey;autoIncrement:false"`
-	ArticleID uint `gorm:"primaryKey;autoIncrement:false"`
-}
-
 func (this *DB) AutoMigrate() *DB {
 	this.Conn.AutoMigrate(&Feed{})
 	this.Conn.AutoMigrate(&Article{})
 	this.Conn.AutoMigrate(&Author{})
 	this.Conn.AutoMigrate(&Attachment{})
-	this.Conn.AutoMigrate(&ArticleTag{})
-	this.Conn.AutoMigrate(&ArticleAttachment{})
-	this.Conn.AutoMigrate(&ArticleAuthor{})
-	this.Conn.AutoMigrate(&FeedTag{})
-	this.Conn.AutoMigrate(&FeedArticle{})
 	return this
 }
