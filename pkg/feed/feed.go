@@ -5,11 +5,6 @@ import (
 	"github.com/xbc5/sumo/pkg/log"
 )
 
-type Image struct {
-	URL   string
-	Title string
-}
-
 type Attachment struct {
 	URL    string
 	Length string
@@ -26,9 +21,9 @@ type Item struct {
 	Author      string
 	Authors     []string
 	GUID        string
-	Banner      *Image
+	Banner      string
 	Categories  []string
-	Attachments []*Attachment
+	Attachments []Attachment
 }
 
 type Feed struct {
@@ -38,7 +33,7 @@ type Feed struct {
 	Links       []string
 	Items       []*Item
 	Language    string
-	Logo        *Image
+	Logo        string
 	Categories  []string
 }
 
@@ -61,41 +56,49 @@ func makeFeed(theirs *gofeed.Feed) *Feed {
 	return ours
 }
 
-func makeItem(theirs *gofeed.Item) *Item {
-	ours := new(Item)
+func makeItem(theirs *gofeed.Item) Item {
 
-	ourImg := new(Image)
-	ours.Banner = ourImg
+	var banner string
 	if theirs.Image != nil {
-		ourImg.Title = theirs.Image.Title
-		ourImg.URL = theirs.Image.URL
+		banner = theirs.Image.URL
 	}
 
+	var author string
 	if theirs.Author != nil {
-		ours.Author = theirs.Author.Name
+		author = theirs.Author.Name
 	}
 
+	authors := []string{}
 	if theirs.Authors != nil {
-		ours.Authors = make([]string, len(theirs.Authors))
-		for i := 0; i < len(theirs.Authors); i++ {
-			ours.Authors[i] = theirs.Authors[i].Name
+		for _, a := range theirs.Authors {
+			authors = append(authors, a.Name)
 		}
 	}
 
-	ours.Title = theirs.Title
-	ours.Description = theirs.Description
-	ours.Content = theirs.Content
-	ours.Link = theirs.Link
-	ours.Updated = theirs.Updated
-	ours.Published = theirs.Published
-	ours.GUID = theirs.GUID
-	ours.Categories = theirs.Categories
+	attachments := []Attachment{}
+	if theirs.Enclosures != nil {
+		for _, enc := range theirs.Enclosures {
+			attachments = append(attachments, Attachment{
+				URL:    enc.URL,
+				Length: enc.Length,
+				Type:   enc.Type,
+			})
+		}
+	}
 
-	ours.Attachments = make([]*Attachment, len(theirs.Enclosures))
-	for i := 0; i < len(theirs.Enclosures); i++ {
-		ours.Attachments[i].URL = theirs.Enclosures[i].URL
-		ours.Attachments[i].Length = theirs.Enclosures[i].Length
-		ours.Attachments[i].Type = theirs.Enclosures[i].Type
+	ours := Item{
+		Link:        theirs.Link,
+		Title:       theirs.Title,
+		Description: theirs.Description,
+		Content:     theirs.Content,
+		Updated:     theirs.Updated,
+		Published:   theirs.Published,
+		Banner:      banner,
+		Author:      author,
+		Authors:     authors,
+		Attachments: attachments,
+		GUID:        theirs.GUID,
+		Categories:  theirs.Categories,
 	}
 
 	return ours
