@@ -40,12 +40,13 @@ func (this *DB) AddArticle(art *feed.Item) *DB {
 		Title:       art.Title,
 		Description: art.Description,
 		Content:     art.Content,
+		Banner:      art.Banner.URL,
 	}
 
 	this.Conn.Clauses(
 		clause.OnConflict{
 			DoUpdates: clause.AssignmentColumns(
-				[]string{"Title", "Description", "Content"},
+				[]string{"Title", "Description", "Content", "Banner"},
 			)},
 	).Create(&record)
 

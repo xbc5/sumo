@@ -65,10 +65,10 @@ func makeItem(theirs *gofeed.Item) *Item {
 	ours := new(Item)
 
 	ourImg := new(Image)
+	ours.Banner = ourImg
 	if theirs.Image != nil {
 		ourImg.Title = theirs.Image.Title
 		ourImg.URL = theirs.Image.URL
-		ours.Banner = ourImg
 	}
 
 	if theirs.Author != nil {
