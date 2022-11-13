@@ -4,6 +4,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/xbc5/sumo/pkg/db"
 	"github.com/xbc5/sumo/pkg/db/dsl"
+	"github.com/xbc5/sumo/pkg/db/model"
 )
 
 func main() {
@@ -11,7 +12,7 @@ func main() {
 
 	dsn := "file:/tmp/sumo.db"
 	conn := db.Open(&dsn)
-	db.AutoMigrate(conn)
+	model.AutoMigrate(conn)
 
 	feedUrl := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
 	_dsl := dsl.DSL{Conn: conn}
