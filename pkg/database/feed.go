@@ -25,7 +25,7 @@ func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
 		Title:       f.Title,
 		Description: f.Description,
 		Language:    f.Language,
-		Logo:        f.Logo.URL,
+		Logo:        f.Logo,
 	}
 	this.Conn.Model(&Feed2{}).
 		Select("Title", "Description", "Language", "Logo").
@@ -34,13 +34,13 @@ func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
 	return this
 }
 
-func (this *DB) AddArticle(art *feed.Article) *DB {
+func (this *DB) AddArticle(art feed.Article) *DB {
 	record := Article{
 		URL:         art.URL,
 		Title:       art.Title,
 		Description: art.Description,
 		Content:     art.Content,
-		Banner:      art.Banner.URL,
+		Banner:      art.Banner,
 	}
 
 	this.Conn.Clauses(
@@ -53,8 +53,8 @@ func (this *DB) AddArticle(art *feed.Article) *DB {
 	return this
 }
 
-func (this *DB) AddArticles(articles *[]*feed.Article) *DB {
-	for _, article := range *articles {
+func (this *DB) AddArticles(articles []feed.Article) *DB {
+	for _, article := range articles {
 		this.AddArticle(article)
 	}
 	return this
