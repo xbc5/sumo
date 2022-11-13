@@ -50,31 +50,29 @@ func makeFeed(gf *gofeed.Feed) Feed {
 		Language:    gf.Language,
 		Tags:        gf.Categories,
 	}
-
-	return ours
 }
 
-func makeArticle(theirs *gofeed.Item) Article {
+func makeArticle(gf *gofeed.Item) Article {
 	var banner string
-	if theirs.Image != nil {
-		banner = theirs.Image.URL
+	if gf.Image != nil {
+		banner = gf.Image.URL
 	}
 
 	var author string
-	if theirs.Author != nil {
-		author = theirs.Author.Name
+	if gf.Author != nil {
+		author = gf.Author.Name
 	}
 
 	authors := []string{}
-	if theirs.Authors != nil {
-		for _, a := range theirs.Authors {
+	if gf.Authors != nil {
+		for _, a := range gf.Authors {
 			authors = append(authors, a.Name)
 		}
 	}
 
 	attachments := []Attachment{}
-	if theirs.Enclosures != nil {
-		for _, enc := range theirs.Enclosures {
+	if gf.Enclosures != nil {
+		for _, enc := range gf.Enclosures {
 			attachments = append(attachments, Attachment{
 				URL:    enc.URL,
 				Length: enc.Length,
@@ -83,27 +81,25 @@ func makeArticle(theirs *gofeed.Item) Article {
 		}
 	}
 
-	ours := Article{
-		URL:         theirs.Link,
-		Title:       theirs.Title,
-		Description: theirs.Description,
-		Content:     theirs.Content,
-		Modified:    theirs.Updated,
-		Published:   theirs.Published,
+	return Article{
+		URL:         gf.Link,
+		Title:       gf.Title,
+		Description: gf.Description,
+		Content:     gf.Content,
+		Modified:    gf.Updated,
+		Published:   gf.Published,
 		Banner:      banner,
 		Author:      author,
 		Authors:     authors,
 		Attachments: attachments,
-		GUID:        theirs.GUID,
-		Tags:        theirs.Categories,
+		GUID:        gf.GUID,
+		Tags:        gf.Categories,
 	}
-
-	return ours
 }
 
-func makeArticles(theirs []*gofeed.Item) []Article {
+func makeArticles(gf []*gofeed.Item) []Article {
 	result := []Article{}
-	for _, item := range theirs {
+	for _, item := range gf {
 		result = append(result, makeArticle(item))
 	}
 	return result
@@ -112,10 +108,14 @@ func makeArticles(theirs []*gofeed.Item) []Article {
 func Get(url string) (Feed, error) {
 	fp := gofeed.NewParser()
 	src, err := fp.ParseURL(url)
-	log.FeedGetErr(url, err)
-	feed := makeFeed(src)
-	articles := makeArticles(src.Items)
-	feed.Articles = articles
 
-	return *feed, err // FIXME: don't use pointers
+	var feed Feed
+	if err != nil {
+		log.FeedGetErr(url, err)
+		feed = makeFeed(src)
+		articles := makeArticles(src.Items)
+		feed.Articles = articles
+	}
+
+	return feed, err
 }
