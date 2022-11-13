@@ -23,7 +23,7 @@ func RowsToStrings(rows *sql.Rows) []string {
 	return result
 }
 
-func ToFeedUrls(feeds *[]*Feed2) []string {
+func ToFeedUrls(feeds *[]*Feed) []string {
 	var urls []string
 	for _, f := range *feeds {
 		urls = append(urls, f.URL)

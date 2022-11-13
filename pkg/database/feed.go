@@ -6,7 +6,7 @@ import (
 )
 
 func (this *DB) AddFeedURL(url string) *DB {
-	record := Feed2{URL: url}
+	record := Feed{URL: url}
 	this.Conn.Clauses(
 		clause.OnConflict{DoNothing: true},
 	).Create(&record)
@@ -14,20 +14,20 @@ func (this *DB) AddFeedURL(url string) *DB {
 }
 
 func (this *DB) GetFeedURLs() []string {
-	var feeds []*Feed2
+	var feeds []*Feed
 	this.Conn.Select("url").Find(&feeds)
 	return ToFeedUrls(&feeds)
 }
 
 func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
-	record := Feed2{
+	record := Feed{
 		URL:         f.URL,
 		Title:       f.Title,
 		Description: f.Description,
 		Language:    f.Language,
 		Logo:        f.Logo,
 	}
-	this.Conn.Model(&Feed2{}).
+	this.Conn.Model(&Feed{}).
 		Select("Title", "Description", "Language", "Logo").
 		Where("url = ?", url).
 		Updates(&record)

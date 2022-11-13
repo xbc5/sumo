@@ -6,7 +6,7 @@ import (
 
 // maxUrl := 2083 // smallest value (MS edge)
 
-type Feed2 struct {
+type Feed struct {
 	gorm.Model
 	Title       string
 	Description string
@@ -72,7 +72,7 @@ type FeedArticle struct {
 }
 
 func (this *DB) AutoMigrate() *DB {
-	this.Conn.AutoMigrate(&Feed2{})
+	this.Conn.AutoMigrate(&Feed{})
 	this.Conn.AutoMigrate(&Article{})
 	this.Conn.AutoMigrate(&Author{})
 	this.Conn.AutoMigrate(&Attachment{})
