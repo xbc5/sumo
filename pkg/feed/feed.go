@@ -29,29 +29,27 @@ type Article struct {
 type Feed struct {
 	Title       string
 	Description string
-	FeedLink    string
-	Links       []string
-	Items       []Article
+	URL         string
+	Articles    []Article
 	Language    string
 	Logo        string
-	Categories  []string
+	Tags        []string
 }
 
-func makeFeed(theirs *gofeed.Feed) *Feed {
-	ours := new(Feed)
-
-	ourImg := new(Image) // avoid nil pointer, always initialise somethng, even if empty
-	ours.Logo = ourImg
-	if theirs.Image != nil {
-		ourImg.Title = theirs.Image.Title
-		ourImg.URL = theirs.Image.URL
+func makeFeed(gf *gofeed.Feed) Feed {
+	var logo string
+	if gf.Image != nil {
+		logo = gf.Image.URL
 	}
 
-	ours.Title = theirs.Title
-	ours.Description = theirs.Description
-	ours.Language = theirs.Language
-	ours.Links = theirs.Links
-	ours.Categories = theirs.Categories
+	return Feed{
+		Title:       gf.Title,
+		Description: gf.Description,
+		URL:         gf.FeedLink,
+		Logo:        logo,
+		Language:    gf.Language,
+		Tags:        gf.Categories,
+	}
 
 	return ours
 }
@@ -117,7 +115,7 @@ func Get(url string) (Feed, error) {
 	log.FeedGetErr(url, err)
 	feed := makeFeed(src)
 	articles := makeArticles(src.Items)
-	feed.Items = articles
+	feed.Articles = articles
 
 	return *feed, err // FIXME: don't use pointers
 }

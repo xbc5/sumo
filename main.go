@@ -19,7 +19,7 @@ func main() {
 		feed, err := feed.Get(url)
 		if err == nil {
 			db.UpdateFeed(url, feed)
-			db.AddArticles(&feed.Items)
+			db.AddArticles(&feed.Articles)
 		}
 	}
 }

@@ -21,7 +21,7 @@ func (this *DB) GetFeedURLs() []string {
 
 func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
 	record := Feed2{
-		URL:         f.FeedLink,
+		URL:         f.URL,
 		Title:       f.Title,
 		Description: f.Description,
 		Language:    f.Language,
