@@ -31,7 +31,7 @@ type Feed struct {
 	Description string
 	FeedLink    string
 	Links       []string
-	Items       []*Article
+	Items       []Article
 	Language    string
 	Logo        string
 	Categories  []string
@@ -103,10 +103,10 @@ func makeArticle(theirs *gofeed.Item) Article {
 	return ours
 }
 
-func makeArticles(theirs []*gofeed.Item) []*Article {
-	var result = make([]*Article, len(theirs))
-	for i := 0; i < len(theirs); i++ {
-		result[i] = makeArticle(theirs[i])
+func makeArticles(theirs []*gofeed.Item) []Article {
+	result := []Article{}
+	for _, item := range theirs {
+		result = append(result, makeArticle(item))
 	}
 	return result
 }
