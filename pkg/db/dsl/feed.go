@@ -2,6 +2,7 @@ package dsl
 
 import (
 	"github.com/xbc5/sumo/pkg/db"
+	"github.com/xbc5/sumo/pkg/feed"
 	"gorm.io/gorm/clause"
 )
 
@@ -16,6 +17,18 @@ func (this *DSL) UpsertFeedURL(url string) *DSL {
 func (this *DSL) SelectFeedURLs() *DSL {
 	record := db.Feed2{}
 	this.Conn = this.Conn.Select("url").Find(&record)
+	return this
+}
+
+func (this *DSL) UpdateFeed(f *feed.Feed) *DSL {
+	record := db.Feed2{
+		URL:         f.FeedLink,
+		Title:       f.Title,
+		Description: f.Description,
+		Language:    f.Language,
+		Logo:        f.Logo.URL,
+	}
+	this.Conn = this.Conn.Model(&db.Feed2{}).Where("url = ?", f.FeedLink).Updates(&record)
 	return this
 }
 
@@ -58,15 +71,5 @@ func (this *Feed) UpsertArticle(art *feed.Item) error {
 	return execErr
 }
 
-const updateFeedQuery = `UPDATE Feed
-SET title = ?, description = ?, language = ?, logo = ?
-WHERE url = ?`
 
-func (this *Feed) UpdateFeed(url string, f *feed.Feed) (sql.Result, error) {
-	statement, err := this.Db.Prepare(updateFeedQuery)
-	log.FeedQueryErr("Cannot prepare statement to insert a Feed", &url, err)
-	result, err := statement.Exec(f.Title, f.Description, f.Language, f.Logo.URL, url)
-	statement.Close()
-	log.FeedQueryErr("Cannot insert Feed", &url, err)
-	return result, err
-}*/
+*/

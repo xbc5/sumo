@@ -11,8 +11,8 @@ type Feed2 struct {
 	Title       string
 	Description string
 	URL         string `gorm:"not null;unique"`
-	language    string
-	logo        string
+	Language    string
+	Logo        string
 }
 
 type Article struct {
