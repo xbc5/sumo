@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
-
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/xbc5/sumo/pkg/database"
+	"github.com/xbc5/sumo/pkg/feed"
 )
 
 func main() {
@@ -13,12 +12,15 @@ func main() {
 	db := database.DB{DSN: "file"}
 	db.Open().AutoMigrate()
 
-	feedUrl1 := "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw"
-	feedUrl2 := "https://www.youtube.com/feeds/videos.xml?channel_id=UC8butISFwT-Wl7EV0hUK0BQ"
-	db.AddFeedURL(feedUrl1).AddFeedURL(feedUrl2)
-	feeds := db.GetFeedURLs()
-
-	fmt.Printf("%s", feeds)
+	googleSEO := "https://feeds.feedburner.com/blogspot/amDG"
+	seoJournal := "https://www.searchenginejournal.com/feed/atom/"
+	db.AddFeedURL(googleSEO).AddFeedURL(seoJournal)
+	for _, url := range db.GetFeedURLs() {
+		feed, err := feed.Get(url)
+		if err == nil {
+			db.UpdateFeed(feed)
+		}
+	}
 
 	/* if err == nil {
 		urls, _ := feedTable.SelectUrls()

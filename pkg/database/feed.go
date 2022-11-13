@@ -19,7 +19,7 @@ func (this *DB) GetFeedURLs() []string {
 	return ToFeedUrls(&feeds)
 }
 
-func (this *DB) UpdateFeed(f *feed.Feed) *DB {
+func (this *DB) UpdateFeed(f feed.Feed) *DB {
 	record := Feed2{
 		URL:         f.FeedLink,
 		Title:       f.Title,
