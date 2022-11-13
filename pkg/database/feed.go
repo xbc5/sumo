@@ -13,10 +13,10 @@ func (this *DB) AddFeedURL(url string) *DB {
 	return this
 }
 
-func (this *DB) GetFeedURLs() []*Feed2 {
-	feeds := []*Feed2{}
+func (this *DB) GetFeedURLs() []string {
+	var feeds []*Feed2
 	this.Conn.Select("url").Find(&feeds)
-	return feeds
+	return ToFeedUrls(&feeds)
 }
 
 func (this *DB) UpdateFeed(f *feed.Feed) *DB {

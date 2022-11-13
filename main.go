@@ -18,7 +18,7 @@ func main() {
 	db.AddFeedURL(feedUrl1).AddFeedURL(feedUrl2)
 	feeds := db.GetFeedURLs()
 
-	fmt.Printf("%s", &feeds)
+	fmt.Printf("%s", feeds)
 
 	/* if err == nil {
 		urls, _ := feedTable.SelectUrls()
