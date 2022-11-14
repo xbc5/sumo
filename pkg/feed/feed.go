@@ -72,9 +72,9 @@ func makeArticle(gf *gofeed.Item) model.Article {
 	}
 }
 
-func makeArticles(gf []*gofeed.Item) []model.Article {
+func makeArticles(items []*gofeed.Item) []model.Article {
 	result := []model.Article{}
-	for _, item := range gf {
+	for _, item := range items {
 		result = append(result, makeArticle(item))
 	}
 	return result
@@ -85,7 +85,7 @@ func Get(url string) (model.Feed, error) {
 	src, err := fp.ParseURL(url)
 
 	var feed model.Feed
-	if err != nil {
+	if err == nil {
 		log.FeedGetErr(url, err)
 		feed = makeFeed(src)
 		feed.Articles = makeArticles(src.Items)

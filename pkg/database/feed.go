@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/xbc5/sumo/pkg/database/model"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -20,8 +21,8 @@ func (this *DB) GetFeedURLs() []string {
 }
 
 func (this *DB) UpdateFeed(url string, feed model.Feed) *DB {
-	this.Conn.Model(&model.Feed{}).
-		Select("Title", "Description", "Language", "Logo").
+	this.Conn.
+		Session(&gorm.Session{FullSaveAssociations: true}).
 		Where("url = ?", url).
 		Updates(&feed)
 	return this
