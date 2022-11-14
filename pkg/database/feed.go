@@ -1,12 +1,12 @@
 package database
 
 import (
-	"github.com/xbc5/sumo/pkg/feed"
+	"github.com/xbc5/sumo/pkg/database/model"
 	"gorm.io/gorm/clause"
 )
 
 func (this *DB) AddFeedURL(url string) *DB {
-	record := Feed{URL: url}
+	record := model.Feed{URL: url}
 	this.Conn.Clauses(
 		clause.OnConflict{DoNothing: true},
 	).Create(&record)
@@ -14,46 +14,31 @@ func (this *DB) AddFeedURL(url string) *DB {
 }
 
 func (this *DB) GetFeedURLs() []string {
-	var feeds []*Feed
+	var feeds []*model.Feed
 	this.Conn.Select("url").Find(&feeds)
 	return ToFeedUrls(&feeds)
 }
 
-func (this *DB) UpdateFeed(url string, f feed.Feed) *DB {
-	record := Feed{
-		URL:         f.URL,
-		Title:       f.Title,
-		Description: f.Description,
-		Language:    f.Language,
-		Logo:        f.Logo,
-	}
-	this.Conn.Model(&Feed{}).
+func (this *DB) UpdateFeed(url string, feed model.Feed) *DB {
+	this.Conn.Model(&model.Feed{}).
 		Select("Title", "Description", "Language", "Logo").
 		Where("url = ?", url).
-		Updates(&record)
+		Updates(&feed)
 	return this
 }
 
-func (this *DB) AddArticle(art feed.Article) *DB {
-	record := Article{
-		URL:         art.URL,
-		Title:       art.Title,
-		Description: art.Description,
-		Content:     art.Content,
-		Banner:      art.Banner,
-	}
-
+func (this *DB) AddArticle(art model.Article) *DB {
 	this.Conn.Clauses(
 		clause.OnConflict{
 			DoUpdates: clause.AssignmentColumns(
 				[]string{"Title", "Description", "Content", "Banner"},
 			)},
-	).Create(&record)
+	).Create(&art)
 
 	return this
 }
 
-func (this *DB) AddArticles(articles []feed.Article) *DB {
+func (this *DB) AddArticles(articles []model.Article) *DB {
 	for _, article := range articles {
 		this.AddArticle(article)
 	}
