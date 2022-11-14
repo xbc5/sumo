@@ -1,4 +1,4 @@
-package database
+package model
 
 import (
 	"gorm.io/gorm"
@@ -42,14 +42,14 @@ type Attachment struct {
 
 type Tag struct {
 	gorm.Model
-	name string `gorm:"not null;unique"`
+	Name string `gorm:"not null;unique"`
 }
 
 type Author struct {
 	gorm.Model
 	// unique because there no other distinguishing attributes,
 	// and we will end up with duplicates
-	name string `gorm:"not null;unique"`
+	Name string `gorm:"not null;unique"`
 }
 
 func (this *DB) AutoMigrate() *DB {
