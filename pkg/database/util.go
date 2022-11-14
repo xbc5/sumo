@@ -31,3 +31,4 @@ func ToFeedUrls(feeds *[]*model.Feed) []string {
 	}
 	return urls
 }
+

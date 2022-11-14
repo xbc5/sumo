@@ -5,6 +5,17 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+func updateOnConflict(tx *gorm.DB, cols []string) {
+	_cols := []clause.Column{}
+	for _, name := range cols {
+		_cols = append(_cols, clause.Column{Name: name})
+	}
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   _cols,
+		UpdateAll: true,
+	})
+}
+
 // maxUrl := 2083 // smallest value (MS edge)
 
 type Feed struct {
@@ -16,6 +27,11 @@ type Feed struct {
 	Logo        string
 	Tags        []Tag     `gorm:"many2many:feed_tags"`
 	Articles    []Article // one-to-many; uses FeedID as FK by default
+}
+
+func (this *Feed) BeforeCreate(tx *gorm.DB) (err error) {
+	updateOnConflict(tx, []string{"url"})
+	return nil
 }
 
 type Article struct {
@@ -34,10 +50,7 @@ type Article struct {
 }
 
 func (this *Article) BeforeCreate(tx *gorm.DB) (err error) {
-	tx.Statement.AddClause(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "id"}, {Name: "url"}},
-		UpdateAll: true,
-	})
+	updateOnConflict(tx, []string{"url"})
 	return nil
 }
 
@@ -49,9 +62,19 @@ type Attachment struct {
 	ArticleID uint // FK
 }
 
+func (this *Attachment) BeforeCreate(tx *gorm.DB) (err error) {
+	updateOnConflict(tx, []string{"url"})
+	return nil
+}
+
 type Tag struct {
 	gorm.Model
 	Name string `gorm:"not null;unique"`
+}
+
+func (this *Tag) BeforeCreate(tx *gorm.DB) (err error) {
+	updateOnConflict(tx, []string{"name"})
+	return nil
 }
 
 type Author struct {
@@ -59,4 +82,9 @@ type Author struct {
 	// unique because there no other distinguishing attributes,
 	// and we will end up with duplicates
 	Name string `gorm:"not null;unique"`
+}
+
+func (this *Author) BeforeCreate(tx *gorm.DB) (err error) {
+	updateOnConflict(tx, []string{"name"})
+	return nil
 }
