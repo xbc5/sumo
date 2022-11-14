@@ -15,11 +15,12 @@ func makeFeed(gf *gofeed.Feed) model.Feed {
 	}
 
 	return model.Feed{
+		URL:         gf.FeedLink,
 		Title:       gf.Title,
 		Description: gf.Description,
-		URL:         gf.FeedLink,
-		Logo:        logo,
 		Language:    gf.Language,
+		Logo:        logo,
+		// Articles is initialised below in Get
 	}
 }
 
@@ -63,8 +64,8 @@ func makeArticle(gf *gofeed.Item) model.Article {
 		Title:       gf.Title,
 		Description: gf.Description,
 		Content:     gf.Content,
-		// ModifiedAt:  gf.Updated,
 		// PublishedAt: gf.Published,
+		// ModifiedAt:  gf.Updated,
 		Banner:      banner,
 		Authors:     authors,
 		Attachments: attachments,
@@ -87,8 +88,7 @@ func Get(url string) (model.Feed, error) {
 	if err != nil {
 		log.FeedGetErr(url, err)
 		feed = makeFeed(src)
-		articles := makeArticles(src.Items)
-		feed.Articles = articles
+		feed.Articles = makeArticles(src.Items)
 	}
 
 	return feed, err

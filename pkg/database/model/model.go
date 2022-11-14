@@ -8,9 +8,9 @@ import (
 
 type Feed struct {
 	gorm.Model
+	URL         string `gorm:"not null;unique"`
 	Title       string
 	Description string
-	URL         string `gorm:"not null;unique"`
 	Language    string
 	Logo        string
 	Tags        []Tag     `gorm:"many2many:feed_tags"`
@@ -19,15 +19,15 @@ type Feed struct {
 
 type Article struct {
 	gorm.Model
+	URL         string `gorm:"not null;unique"`
 	Title       string `gorm:"not null"`
 	Description string
 	Content     string
-	URL         string `gorm:"not null;unique"`
 	PublishedAt uint64 // TODO: if not provided, set to CreatedAt
 	ModifiedAt  uint64
 	Banner      string
-	Tags        []Tag        `gorm:"many2many:article_tags"`
 	Authors     []Author     `gorm:"many2many:article_authors"`
+	Tags        []Tag        `gorm:"many2many:article_tags"`
 	Attachments []Attachment // uses ArticleID as FK by default
 	FeedID      uint         // FK
 }
