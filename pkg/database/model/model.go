@@ -51,11 +51,3 @@ type Author struct {
 	// and we will end up with duplicates
 	Name string `gorm:"not null;unique"`
 }
-
-func (this *DB) AutoMigrate() *DB {
-	this.Conn.AutoMigrate(&Feed{})
-	this.Conn.AutoMigrate(&Article{})
-	this.Conn.AutoMigrate(&Author{})
-	this.Conn.AutoMigrate(&Attachment{})
-	return this
-}
