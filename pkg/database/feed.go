@@ -26,21 +26,3 @@ func (this *DB) UpdateFeed(url string, feed model.Feed) *DB {
 		Updates(&feed)
 	return this
 }
-
-func (this *DB) AddArticle(art model.Article) *DB {
-	this.Conn.Clauses(
-		clause.OnConflict{
-			DoUpdates: clause.AssignmentColumns(
-				[]string{"Title", "Description", "Content", "Banner"},
-			)},
-	).Create(&art)
-
-	return this
-}
-
-func (this *DB) AddArticles(articles []model.Article) *DB {
-	for _, article := range articles {
-		this.AddArticle(article)
-	}
-	return this
-}
