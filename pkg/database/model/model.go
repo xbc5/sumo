@@ -2,6 +2,7 @@ package model
 
 import (
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // maxUrl := 2083 // smallest value (MS edge)
@@ -30,6 +31,14 @@ type Article struct {
 	Tags        []Tag        `gorm:"many2many:article_tags"`
 	Attachments []Attachment // uses ArticleID as FK by default
 	FeedID      uint         // FK
+}
+
+func (this *Article) BeforeCreate(tx *gorm.DB) (err error) {
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}, {Name: "url"}},
+		UpdateAll: true,
+	})
+	return nil
 }
 
 type Attachment struct {
