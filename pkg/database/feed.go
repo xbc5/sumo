@@ -24,6 +24,6 @@ func (this *DB) UpdateFeed(url string, feed model.Feed) *DB {
 	this.Conn.
 		Session(&gorm.Session{FullSaveAssociations: true}).
 		Where("url = ?", url).
-		Updates(&feed)
+		Create(&feed)
 	return this
 }
