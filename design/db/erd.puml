@@ -1,0 +1,80 @@
+@startuml
+hide circle
+
+entity Feed {
+  id <<primary>>
+  title
+  description
+  url
+  language
+  logo
+}
+
+entity FeedArticle {
+  feed_id
+  article_id
+}
+
+entity Article {
+  id <<primary>>
+	title
+	description
+	content
+  url
+	updated
+	published
+	banner
+}
+
+entity ArticleAuthor {
+  article_id
+  author_id
+}
+
+entity Author {
+  id <<primary>>
+  name
+}
+
+entity ArticleTag {
+  article_id
+  tag_id
+}
+
+entity FeedTag {
+  feed_id
+  tag_id
+}
+
+entity Tag {
+  id <<primary>>
+  name
+}
+
+entity ArticleAttachement {
+  article_id
+  attachement_id
+}
+
+entity Attachement {
+  id <<primary>>
+  url
+  length
+  type
+}
+
+Article -- ArticleAuthor
+ArticleAuthor -- Author
+
+Article -- ArticleTag
+ArticleTag -- Tag
+
+Feed -- FeedTag
+FeedTag -- Tag
+
+Feed -- FeedArticle
+FeedArticle -- Article
+
+Article -- ArticleAttachement
+ArticleAttachement -- Attachement
+@enduml
