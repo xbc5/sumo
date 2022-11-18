@@ -1,5 +1,9 @@
 # the binary
 sumo
+
+# delv
+__debug_bin
+
 # Created by https://www.toptal.com/developers/gitignore/api/vim,linux,go
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,linux,go
 

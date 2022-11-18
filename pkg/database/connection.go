@@ -14,9 +14,14 @@ func (this *DB) Open() *DB {
 		dsn = "file:/tmp/sumo.db"
 	}
 
-	conn, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
+	conf := gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
-	})
+	}
+	if this.Config != nil {
+		conf = *this.Config
+	}
+
+	conn, err := gorm.Open(sqlite.Open(dsn), &conf)
 
 	if err != nil {
 		panic("failed to connect database") // FIXME logger

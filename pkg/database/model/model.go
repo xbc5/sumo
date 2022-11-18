@@ -5,15 +5,12 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func updateOnConflict(tx *gorm.DB, cols []string) {
+func cols(cols []string) []clause.Column {
 	_cols := []clause.Column{}
 	for _, name := range cols {
 		_cols = append(_cols, clause.Column{Name: name})
 	}
-	tx.Statement.AddClause(clause.OnConflict{
-		Columns:   _cols,
-		UpdateAll: true,
-	})
+	return _cols
 }
 
 // maxUrl := 2083 // smallest value (MS edge)
@@ -30,7 +27,10 @@ type Feed struct {
 }
 
 func (this *Feed) BeforeCreate(tx *gorm.DB) (err error) {
-	updateOnConflict(tx, []string{"url"})
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   cols([]string{"url"}),
+		UpdateAll: true,
+	})
 	return nil
 }
 
@@ -50,7 +50,10 @@ type Article struct {
 }
 
 func (this *Article) BeforeCreate(tx *gorm.DB) (err error) {
-	updateOnConflict(tx, []string{"url"})
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   cols([]string{"url"}),
+		UpdateAll: true,
+	})
 	return nil
 }
 
@@ -63,7 +66,10 @@ type Attachment struct {
 }
 
 func (this *Attachment) BeforeCreate(tx *gorm.DB) (err error) {
-	updateOnConflict(tx, []string{"url"})
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   cols([]string{"url"}),
+		UpdateAll: true,
+	})
 	return nil
 }
 
@@ -73,7 +79,26 @@ type Tag struct {
 }
 
 func (this *Tag) BeforeCreate(tx *gorm.DB) (err error) {
-	updateOnConflict(tx, []string{"name"})
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   cols([]string{"name"}),
+		UpdateAll: true, // updates join table when adding pattern+tag
+	})
+	return nil
+}
+
+type Pattern struct {
+	gorm.Model
+	Name        string `gorm:"not null;unique"`
+	Description string `gorm:"not null"`
+	Pattern     string `gorm:"not null;unique"`
+	Tags        []Tag  `gorm:"many2many:tag_patterns"`
+}
+
+func (this *Pattern) BeforeCreate(tx *gorm.DB) (err error) {
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   cols([]string{"pattern"}),
+		UpdateAll: true, // updates join table when adding pattern+tag
+	})
 	return nil
 }
 
@@ -85,6 +110,9 @@ type Author struct {
 }
 
 func (this *Author) BeforeCreate(tx *gorm.DB) (err error) {
-	updateOnConflict(tx, []string{"name"})
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   cols([]string{"name"}),
+		UpdateAll: true,
+	})
 	return nil
 }
