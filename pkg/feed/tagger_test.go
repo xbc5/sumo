@@ -229,7 +229,7 @@ var _ = Describe("tagger pkg", func() {
 		})
 	})
 
-	Context("TagFeed(): given two feeds with patterns that match feed text only", func() {
+	Context("Tag(): given two feeds with patterns that match feed text only", func() {
 		It("should not error", func() {
 			fixture, patterns, _ := aPatternThatMatchesOnlyFeed()
 
@@ -301,7 +301,7 @@ var _ = Describe("tagger pkg", func() {
 		})
 	})
 
-	Context("TagFeed(): given two feeds with patterns that match only the article text", func() {
+	Context("Tag(): given two feeds with patterns that match only the article text", func() {
 		It("should not error", func() {
 			fakeFeed, patterns, _ := feedWithMatchingArticles()
 
@@ -386,7 +386,7 @@ var _ = Describe("tagger pkg", func() {
 		})
 	})
 
-	Context("TagFeed(): when given a feed with no articles", func() {
+	Context("Tag(): when given a feed with no articles", func() {
 		It("should not error", func() {
 			fixture, patterns := feedWithNoArticles()
 			_, err := feed.Tag(fixture, patterns)
