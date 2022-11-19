@@ -1,11 +1,11 @@
-package tagger_test
+package feed_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/xbc5/sumo/pkg/database/model"
+	"github.com/xbc5/sumo/pkg/feed"
 	t "github.com/xbc5/sumo/pkg/mytest"
-	"github.com/xbc5/sumo/pkg/tagger"
 )
 
 func noTags() model.Feed {
@@ -110,7 +110,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "foo", tags),
 			}
 
-			result, _ := tagger.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTexts(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(2))
@@ -132,7 +132,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "bar", tags2),
 			}
 
-			result, _ := tagger.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTexts(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(3))
@@ -157,7 +157,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "foo", tags1),
 			}
 
-			result, _ := tagger.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTexts(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(2))
@@ -176,7 +176,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "bad-match", tags),
 			}
 
-			result, _ := tagger.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTexts(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(0))
@@ -186,13 +186,13 @@ var _ = Describe("tagger pkg", func() {
 	Context("TagArticles(): given two articles with patterns that match", func() {
 		It("should return two articles", func() {
 			articles, patterns, _ := articlesWithMatchingPatterns()
-			result, _ := tagger.TagArticles(articles, patterns)
+			result, _ := feed.TagArticles(articles, patterns)
 			Expect(result).To(HaveLen(2))
 		})
 
 		It("should return an expected number of tags for each article", func() {
 			articles, patterns, _ := articlesWithMatchingPatterns()
-			result, _ := tagger.TagArticles(articles, patterns)
+			result, _ := feed.TagArticles(articles, patterns)
 
 			t0 := result[0].Tags
 			t1 := result[1].Tags
@@ -203,7 +203,7 @@ var _ = Describe("tagger pkg", func() {
 
 		It("should set the correct tags on the correct article", func() {
 			articles, patterns, tags := articlesWithMatchingPatterns()
-			result, _ := tagger.TagArticles(articles, patterns)
+			result, _ := feed.TagArticles(articles, patterns)
 
 			t0 := result[0].Tags
 			t1 := result[1].Tags
@@ -219,33 +219,32 @@ var _ = Describe("tagger pkg", func() {
 
 		It("should not set duplicate tags on each article", func() {
 			articles, patterns, _ := articlesWithMatchingPatterns()
-			result, _ := tagger.TagArticles(articles, patterns)
+			result, _ := feed.TagArticles(articles, patterns)
 
 			t0 := result[0].Tags
 			t1 := result[1].Tags
 
 			Expect(t0[0]).NotTo(Equal(t0[1]))
 			Expect(t1[0]).NotTo(Equal(t1[1]))
-
 		})
 	})
 
 	Context("TagFeed(): given two feeds with patterns that match feed text only", func() {
 		It("should not error", func() {
-			feed, patterns, _ := aPatternThatMatchesOnlyFeed()
+			fixture, patterns, _ := aPatternThatMatchesOnlyFeed()
 
-			_, err0 := tagger.TagFeed(feed[0], patterns)
-			_, err1 := tagger.TagFeed(feed[1], patterns)
+			_, err0 := feed.Tag(fixture[0], patterns)
+			_, err1 := feed.Tag(fixture[1], patterns)
 
 			Expect(err0).ShouldNot(HaveOccurred())
 			Expect(err1).ShouldNot(HaveOccurred())
 		})
 
 		It("should set the expected number of tags on each feed", func() {
-			feed, patterns, _ := aPatternThatMatchesOnlyFeed()
+			fixture, patterns, _ := aPatternThatMatchesOnlyFeed()
 
-			result0, _ := tagger.TagFeed(feed[0], patterns)
-			result1, _ := tagger.TagFeed(feed[1], patterns)
+			result0, _ := feed.Tag(fixture[0], patterns)
+			result1, _ := feed.Tag(fixture[1], patterns)
 
 			feedTags0 := result0.Tags
 			feedTags1 := result1.Tags
@@ -255,10 +254,10 @@ var _ = Describe("tagger pkg", func() {
 		})
 
 		It("should set the expected tags on each feed", func() {
-			feed, patterns, tags := aPatternThatMatchesOnlyFeed()
+			fixture, patterns, tags := aPatternThatMatchesOnlyFeed()
 
-			result0, _ := tagger.TagFeed(feed[0], patterns)
-			result1, _ := tagger.TagFeed(feed[1], patterns)
+			result0, _ := feed.Tag(fixture[0], patterns)
+			result1, _ := feed.Tag(fixture[1], patterns)
 
 			feedTags0 := result0.Tags
 			feedTags1 := result1.Tags
@@ -272,10 +271,10 @@ var _ = Describe("tagger pkg", func() {
 		})
 
 		It("should not set duplicate tags on each feed", func() {
-			feed, patterns, _ := aPatternThatMatchesOnlyFeed()
+			fixture, patterns, _ := aPatternThatMatchesOnlyFeed()
 
-			result0, err0 := tagger.TagFeed(feed[0], patterns)
-			result1, err1 := tagger.TagFeed(feed[1], patterns)
+			result0, err0 := feed.Tag(fixture[0], patterns)
+			result1, err1 := feed.Tag(fixture[1], patterns)
 
 			Expect(err0).ShouldNot(HaveOccurred())
 			Expect(err1).ShouldNot(HaveOccurred())
@@ -288,10 +287,10 @@ var _ = Describe("tagger pkg", func() {
 		})
 
 		It("should not set tags on any articles", func() {
-			feed, patterns, _ := aPatternThatMatchesOnlyFeed()
+			fixture, patterns, _ := aPatternThatMatchesOnlyFeed()
 
-			result0, _ := tagger.TagFeed(feed[0], patterns)
-			result1, _ := tagger.TagFeed(feed[1], patterns)
+			result0, _ := feed.Tag(fixture[0], patterns)
+			result1, _ := feed.Tag(fixture[1], patterns)
 
 			for _, feed := range []model.Feed{result0, result1} {
 				for _, article := range feed.Articles {
@@ -306,8 +305,8 @@ var _ = Describe("tagger pkg", func() {
 		It("should not error", func() {
 			fakeFeed, patterns, _ := feedWithMatchingArticles()
 
-			_, err0 := tagger.TagFeed(fakeFeed[0], patterns)
-			_, err1 := tagger.TagFeed(fakeFeed[1], patterns)
+			_, err0 := feed.Tag(fakeFeed[0], patterns)
+			_, err1 := feed.Tag(fakeFeed[1], patterns)
 
 			Expect(err0).ShouldNot(HaveOccurred())
 			Expect(err1).ShouldNot(HaveOccurred())
@@ -316,8 +315,8 @@ var _ = Describe("tagger pkg", func() {
 		It("should return the expected number of articles for each feed", func() {
 			fakeFeed, patterns, _ := feedWithMatchingArticles()
 
-			result0, _ := tagger.TagFeed(fakeFeed[0], patterns)
-			result1, _ := tagger.TagFeed(fakeFeed[1], patterns)
+			result0, _ := feed.Tag(fakeFeed[0], patterns)
+			result1, _ := feed.Tag(fakeFeed[1], patterns)
 
 			a0 := result0.Articles
 			a1 := result1.Articles
@@ -328,14 +327,17 @@ var _ = Describe("tagger pkg", func() {
 		It("should set the expected number of tags for each article", func() {
 			fakeFeed, patterns, _ := feedWithMatchingArticles()
 
-			result0, _ := tagger.TagFeed(fakeFeed[0], patterns)
-			result1, _ := tagger.TagFeed(fakeFeed[1], patterns)
+			result0, _ := feed.Tag(fakeFeed[0], patterns)
+			result1, _ := feed.Tag(fakeFeed[1], patterns)
 
 			articles0 := result0.Articles
 			articles1 := result1.Articles
 
 			Expect(articles0[0].Tags).To(HaveLen(2)) // tags0: X, Y
-			Expect(articles0[1].Tags).To(HaveLen(3)) // tags0 + tags 1: X, Y, Z -- (3 not 4, because of dupe tags)
+			Expect(
+				articles0[1].Tags,
+			).To(HaveLen(3))
+			// tags0 + tags 1: X, Y, Z -- (3 not 4, because of dupe tags)
 
 			Expect(articles1[0].Tags).To(HaveLen(0)) // is 999, no match
 			Expect(articles1[1].Tags).To(HaveLen(2)) // tags0: X, Y
@@ -348,8 +350,8 @@ var _ = Describe("tagger pkg", func() {
 			allTags = append(allTags, tags[0]...)
 			allTags = append(allTags, tags[1]...)
 
-			result0, _ := tagger.TagFeed(fakeFeed[0], patterns)
-			result1, _ := tagger.TagFeed(fakeFeed[1], patterns)
+			result0, _ := feed.Tag(fakeFeed[0], patterns)
+			result1, _ := feed.Tag(fakeFeed[1], patterns)
 
 			articles0 := result0.Articles
 			articles1 := result1.Articles
@@ -373,8 +375,8 @@ var _ = Describe("tagger pkg", func() {
 		It("should set the feed tags to an empty slice", func() {
 			fakeFeed, patterns, _ := feedWithMatchingArticles()
 
-			result0, _ := tagger.TagFeed(fakeFeed[0], patterns)
-			result1, _ := tagger.TagFeed(fakeFeed[1], patterns)
+			result0, _ := feed.Tag(fakeFeed[0], patterns)
+			result1, _ := feed.Tag(fakeFeed[1], patterns)
 
 			// article tags should not have matched
 			for _, feed := range []model.Feed{result0, result1} {
@@ -386,14 +388,14 @@ var _ = Describe("tagger pkg", func() {
 
 	Context("TagFeed(): when given a feed with no articles", func() {
 		It("should not error", func() {
-			feed, patterns := feedWithNoArticles()
-			_, err := tagger.TagFeed(feed, patterns)
+			fixture, patterns := feedWithNoArticles()
+			_, err := feed.Tag(fixture, patterns)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should return a feed with empty articles", func() {
-			feed, patterns := feedWithNoArticles()
-			result, _ := tagger.TagFeed(feed, patterns)
+			fixture, patterns := feedWithNoArticles()
+			result, _ := feed.Tag(fixture, patterns)
 			Expect(result.Articles).ToNot(BeNil())
 			Expect(result.Articles).To(HaveLen(0))
 		})

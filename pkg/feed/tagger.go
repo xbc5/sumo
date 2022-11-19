@@ -1,4 +1,4 @@
-package tagger
+package feed
 
 import (
 	"regexp"
@@ -49,7 +49,7 @@ func TagArticles(articles []model.Article, patterns []model.Pattern) ([]model.Ar
 	return result, nil
 }
 
-func TagFeed(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+func Tag(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
 	texts := []string{feed.Title, feed.Description}
 
 	feedTags, feedErr := ScanTexts(texts, patterns)
