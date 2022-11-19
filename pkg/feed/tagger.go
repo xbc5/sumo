@@ -6,7 +6,7 @@ import (
 	"github.com/xbc5/sumo/pkg/database/model"
 )
 
-func ScanTexts(texts []string, patterns []model.Pattern) ([]string, error) {
+func scanTexts(texts []string, patterns []model.Pattern) ([]string, error) {
 	found := map[string]bool{} // must initialise, so it has a reference for passing to setFound
 
 	for _, pat := range patterns {
@@ -35,11 +35,11 @@ func ScanTexts(texts []string, patterns []model.Pattern) ([]string, error) {
 	return tags, nil
 }
 
-func TagArticles(articles []model.Article, patterns []model.Pattern) ([]model.Article, error) {
+func tagArticles(articles []model.Article, patterns []model.Pattern) ([]model.Article, error) {
 	result := make([]model.Article, len(articles))
 	for i, a := range articles {
 		texts := []string{a.Title, a.Description, a.Description}
-		tags, err := ScanTexts(texts, patterns)
+		tags, err := scanTexts(texts, patterns)
 		if err != nil {
 			return articles, err
 		}
@@ -52,12 +52,12 @@ func TagArticles(articles []model.Article, patterns []model.Pattern) ([]model.Ar
 func Tag(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
 	texts := []string{feed.Title, feed.Description}
 
-	feedTags, feedErr := ScanTexts(texts, patterns)
+	feedTags, feedErr := scanTexts(texts, patterns)
 	if feedErr != nil {
 		return feed, feedErr
 	}
 
-	articles, artErr := TagArticles(feed.Articles, patterns)
+	articles, artErr := tagArticles(feed.Articles, patterns)
 	if artErr != nil {
 		return feed, artErr
 	}
