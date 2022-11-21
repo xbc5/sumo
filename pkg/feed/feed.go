@@ -2,6 +2,7 @@ package feed
 
 import (
 	"strconv"
+	"sync"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/xbc5/sumo/pkg/database/model"
@@ -103,37 +104,45 @@ type Feeds struct {
 	Threads     int
 }
 
-func (this *Feeds) worker(jobs <-chan string, results chan<- model.Feed) {
+func (this *Feeds) worker(jobs <-chan string, results chan<- model.Feed, wg *sync.WaitGroup) {
 	for url := range jobs {
 		f, err := this.Get(url)
 		if err != nil {
 			this.OnErr("Cannot fetch feed", err)
+			wg.Done() // remove this if doing retry logic
 			continue
 		}
 
 		pat, err := this.GetPatterns()
 		if err != nil {
 			this.OnErr("Cannot fetch patterns", err)
+			wg.Done() // remove this if doing retry logic
 			continue
 		}
 
 		f, err = Tag(f, pat)
 		if err != nil {
 			this.OnErr("Cannot tag feed", err)
+			wg.Done() // remove this if doing retry logic
 			continue
 		}
+
 		results <- f
+		wg.Done()
 	}
 }
 
-func (this *Feeds) GoGet(
+func (this *Feeds) Save(
 	urls []string,
-) {
+) *sync.WaitGroup {
 	jobs := make(chan string)
 	results := make(chan model.Feed)
 
+	var wg sync.WaitGroup
+	wg.Add(len(urls))
+
 	for i := 0; i < this.Threads; i++ {
-		go this.worker(jobs, results)
+		go this.worker(jobs, results, &wg)
 	}
 
 	// receive
@@ -146,4 +155,6 @@ func (this *Feeds) GoGet(
 		jobs <- url
 	}
 	close(jobs)
+
+	return &wg
 }
