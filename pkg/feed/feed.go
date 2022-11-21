@@ -89,7 +89,61 @@ func Get(url string) (model.Feed, error) {
 		log.FeedGetErr(url, err)
 		feed = makeFeed(src)
 		feed.Articles = makeArticles(src.Items)
+		feed.URL = url // a lot of times the feed URL is absent, and this is a pain
 	}
 
 	return feed, err
+}
+
+type Feeds struct {
+	GetPatterns func() ([]model.Pattern, error)
+	OnErr       func(msg string, err error)
+	Get         func(string) (model.Feed, error)
+	Put         func(url string, feed model.Feed)
+	Threads     int
+}
+
+func (this *Feeds) worker(jobs <-chan string, results chan<- model.Feed) {
+	for url := range jobs {
+		f, err := this.Get(url)
+		if err != nil {
+			this.OnErr("Cannot fetch feed", err)
+			continue
+		}
+
+		pat, err := this.GetPatterns()
+		if err != nil {
+			this.OnErr("Cannot fetch patterns", err)
+			continue
+		}
+
+		f, err = Tag(f, pat)
+		if err != nil {
+			this.OnErr("Cannot tag feed", err)
+			continue
+		}
+		results <- f
+	}
+}
+
+func (this *Feeds) GoGet(
+	urls []string,
+) {
+	jobs := make(chan string)
+	results := make(chan model.Feed)
+
+	for i := 0; i < this.Threads; i++ {
+		go this.worker(jobs, results)
+	}
+
+	// receive
+	for result := range results {
+		this.Put(result.URL, result)
+	}
+
+	// send
+	for _, url := range urls {
+		jobs <- url
+	}
+	close(jobs)
 }
