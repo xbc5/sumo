@@ -20,38 +20,38 @@ type (
 	putFn func(url string, feed model.Feed) interface{} // we don't care about the return type
 )
 
-func saveFeedsWorker(
+func (this *API) saveFeedsWorker(
 	wg *sync.WaitGroup,
 	pool chan string,
 	pat []model.Pattern,
-	get getFn,
-	tag tagFn,
-	put putFn,
 ) {
+	// FIXME: log errors? you might want to remove logging from individual funcs then
 	for url := range pool {
-		f, err := get(url)
+		f, err := this.FetchFeed(url)
 		if err != nil {
 			wg.Done()
 			continue
 		}
-		tagged, err := tag(f, pat)
+		tagged, err := this.TagFeed(f, pat)
 		if err != nil {
 			wg.Done()
 			continue
 		}
-		put(url, tagged)
+		err = this.SaveFeed(this.db, tagged)
+		if err != nil {
+			wg.Done()
+			continue
+		}
 		wg.Done()
 	}
 }
 
-func saveFeeds(
-	urls []string,
-	pat []model.Pattern,
+func (this *API) UpdateFeeds(
 	threads int,
-	get getFn,
-	tag tagFn,
-	put putFn,
 ) {
+	urls, _ := this.GetFeedUrls(this.db) // FIXME handle error
+	pat, _ := this.GetPatterns(this.db)  // FIXME handle error
+
 	ch := make(chan string)
 	go sendJobs(ch, urls)
 
@@ -59,7 +59,7 @@ func saveFeeds(
 	wg.Add(len(urls))
 
 	for t := 1; t <= threads; t++ {
-		go saveFeedsWorker(&wg, ch, pat, get, tag, put)
+		go this.saveFeedsWorker(&wg, ch, pat)
 	}
 
 	wg.Wait()
