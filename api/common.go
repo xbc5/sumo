@@ -37,7 +37,7 @@ func (this *API) New() *API {
 	}
 	err = db.AutoMigrate(d)
 	if err != nil {
-		this.OnDBErr(err).Msg("Cannot connect to the database")
+		this.OnDBErr(err).Msg("Cannot migrate schema")
 		return this
 	}
 	this.db = d
@@ -63,7 +63,7 @@ func (this *API) NewTest(realDb bool) (*API, mytest.StubData) {
 		}
 		err = db.AutoMigrate(d)
 		if err != nil {
-			this.OnDBErr(err).Msg("Cannot connect to the database")
+			this.OnDBErr(err).Msg("Cannot migrate schema")
 			return this, stubData
 		}
 		this.db = d
