@@ -28,7 +28,11 @@ func fakePatterns() []model.Pattern {
 }
 
 func fakeGet(url string) (model.Feed, error) {
-	return mytest.FakeFeed(1, fakeTags(), fakeAricles()), nil
+	return fakeFeed(), nil
+}
+
+func fakeGetErr(url string) (model.Feed, error) {
+	return fakeFeed(), errors.New("Fake get error")
 }
 
 func fakeTags() []string {
@@ -94,21 +98,21 @@ var _ = Describe("saveFeeds", func() {
 
 		It("should not attempt to tag the feed on error", func() {
 			fnCalled := 0
-			withGet(func(url string) (model.Feed, error) {
-				return fakeFeed(), errors.New("Fake error")
-			}, fakePut, func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
-				fnCalled++
-				return fakeFeed(), nil
-			})
+			withGet(
+				fakeGetErr,
+				fakePut,
+				func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+					fnCalled++
+					return fakeFeed(), nil
+				},
+			)
 
 			Expect(fnCalled).To(Equal(0))
 		})
 
 		It("should not put to the database on error", func() {
 			fnCalled := 0
-			withGet(func(url string) (model.Feed, error) {
-				return fakeFeed(), errors.New("Fake error")
-			}, func(url string, feed model.Feed) interface{} {
+			withGet(fakeGetErr, func(url string, feed model.Feed) interface{} {
 				fnCalled++
 				return nil
 			}, fakeTagger)
