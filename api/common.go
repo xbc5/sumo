@@ -6,6 +6,7 @@ import (
 	"github.com/xbc5/sumo/lib/database/model"
 	"github.com/xbc5/sumo/lib/feed"
 	"github.com/xbc5/sumo/lib/log"
+	"github.com/xbc5/sumo/lib/mytest"
 	"gorm.io/gorm"
 )
 
@@ -36,6 +37,31 @@ func (this *API) New() *API {
 	if err != nil {
 		this.OnDBErr(err).Msg("Cannot connect to the database")
 		return this
+	}
+	this.db = d
+	return this
+}
+
+func (this *API) NewTest(realDb bool) *API {
+	this.OnDBErr = mytest.OnDbErrStub
+	this.GetFeedUrls = mytest.GetFeedUrlsStub
+	this.GetPatterns = mytest.GetPatternsStub
+	this.TagFeed = mytest.TagStub
+	this.SaveFeed = mytest.UpdateFeedStub
+
+	if realDb {
+		this.DSN = "memory"
+		d, err := db.Open(this.DSN, nil)
+		if err != nil {
+			this.OnDBErr(err).Msg("Cannot connect to the database")
+			return this
+		}
+		err = db.AutoMigrate(d)
+		if err != nil {
+			this.OnDBErr(err).Msg("Cannot connect to the database")
+			return this
+		}
+		this.db = d
 	}
 	return this
 }
