@@ -1,6 +1,7 @@
 package feed
 
 var (
-	TagArticles = tagArticles
-	ScanTexts   = scanTexts
+	TagArticlesX = tagArticles
+	ScanTextsX   = scanTexts
+	SaveFeedsX   = saveFeeds
 )

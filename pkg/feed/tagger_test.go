@@ -110,7 +110,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "foo", tags),
 			}
 
-			result, _ := feed.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTextsX(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(2))
@@ -132,7 +132,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "bar", tags2),
 			}
 
-			result, _ := feed.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTextsX(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(3))
@@ -157,7 +157,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "foo", tags1),
 			}
 
-			result, _ := feed.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTextsX(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(2))
@@ -176,7 +176,7 @@ var _ = Describe("tagger pkg", func() {
 				t.FakePattern(1, "bad-match", tags),
 			}
 
-			result, _ := feed.ScanTexts(texts, patterns)
+			result, _ := feed.ScanTextsX(texts, patterns)
 			r := result
 
 			Expect(r).To(HaveLen(0))
@@ -186,13 +186,13 @@ var _ = Describe("tagger pkg", func() {
 	Context("TagArticles(): given two articles with patterns that match", func() {
 		It("should return two articles", func() {
 			articles, patterns, _ := articlesWithMatchingPatterns()
-			result, _ := feed.TagArticles(articles, patterns)
+			result, _ := feed.TagArticlesX(articles, patterns)
 			Expect(result).To(HaveLen(2))
 		})
 
 		It("should return an expected number of tags for each article", func() {
 			articles, patterns, _ := articlesWithMatchingPatterns()
-			result, _ := feed.TagArticles(articles, patterns)
+			result, _ := feed.TagArticlesX(articles, patterns)
 
 			t0 := result[0].Tags
 			t1 := result[1].Tags
@@ -203,7 +203,7 @@ var _ = Describe("tagger pkg", func() {
 
 		It("should set the correct tags on the correct article", func() {
 			articles, patterns, tags := articlesWithMatchingPatterns()
-			result, _ := feed.TagArticles(articles, patterns)
+			result, _ := feed.TagArticlesX(articles, patterns)
 
 			t0 := result[0].Tags
 			t1 := result[1].Tags
@@ -219,7 +219,7 @@ var _ = Describe("tagger pkg", func() {
 
 		It("should not set duplicate tags on each article", func() {
 			articles, patterns, _ := articlesWithMatchingPatterns()
-			result, _ := feed.TagArticles(articles, patterns)
+			result, _ := feed.TagArticlesX(articles, patterns)
 
 			t0 := result[0].Tags
 			t1 := result[1].Tags
