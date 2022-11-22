@@ -105,10 +105,9 @@ func sendJobs(ch chan string, jobs []string) chan string {
 }
 
 type (
-	getFn   func(url string) (model.Feed, error)
-	tagFn   func(feed model.Feed, patterns []model.Pattern) (model.Feed, error)
-	putFn   func(url string, feed model.Feed) interface{} // we don't care about the return type
-	onErrFn func(msg string, err error) interface{}
+	getFn func(url string) (model.Feed, error)
+	tagFn func(feed model.Feed, patterns []model.Pattern) (model.Feed, error)
+	putFn func(url string, feed model.Feed) interface{} // we don't care about the return type
 )
 
 func saveFeedsWorker(
@@ -118,18 +117,15 @@ func saveFeedsWorker(
 	get getFn,
 	tag tagFn,
 	put putFn,
-	onErr onErrFn,
 ) {
 	for url := range pool {
 		f, err := get(url)
 		if err != nil {
-			onErr("Cannot fetch feed", err)
 			wg.Done()
 			continue
 		}
 		tagged, err := tag(f, pat)
 		if err != nil {
-			onErr("Cannot tag feed", err)
 			wg.Done()
 			continue
 		}
@@ -145,7 +141,6 @@ func saveFeeds(
 	get getFn,
 	tag tagFn,
 	put putFn,
-	onErr onErrFn,
 ) {
 	ch := make(chan string)
 	go sendJobs(ch, urls)
@@ -154,7 +149,7 @@ func saveFeeds(
 	wg.Add(len(urls))
 
 	for t := 1; t <= threads; t++ {
-		go saveFeedsWorker(&wg, ch, pat, get, tag, put, onErr)
+		go saveFeedsWorker(&wg, ch, pat, get, tag, put)
 	}
 
 	wg.Wait()

@@ -1,6 +1,8 @@
 package feed_test
 
 import (
+	"errors"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/xbc5/sumo/pkg/database/model"
@@ -51,7 +53,8 @@ func fakeTagger(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
 
 func withGet(
 	getFn func(url string) (model.Feed, error),
-	onErr func(msg string, err error) interface{},
+	putFn func(url string, feed model.Feed) interface{},
+	tagFn func(feed model.Feed, patterns []model.Pattern) (model.Feed, error),
 ) []string {
 	urls := []string{"https://one.com", "https://two.com"}
 	feed.SaveFeedsX(
@@ -59,9 +62,8 @@ func withGet(
 		fakePatterns(),
 		2,
 		getFn,
-		fakeTagger,
-		fakePut,
-		fakeOnErr,
+		tagFn,
+		putFn,
 	)
 	return urls
 }
@@ -73,7 +75,7 @@ var _ = Describe("saveFeeds", func() {
 			urls := withGet(func(url string) (model.Feed, error) {
 				fetched = append(fetched, url)
 				return fakeFeed(), nil
-			}, fakeOnErr)
+			}, fakePut, fakeTagger)
 
 			Expect(fetched).To(HaveLen(len(urls)))
 		})
@@ -83,11 +85,35 @@ var _ = Describe("saveFeeds", func() {
 			urls := withGet(func(url string) (model.Feed, error) {
 				fetched = append(fetched, url)
 				return fakeFeed(), nil
-			}, fakeOnErr)
+			}, fakePut, fakeTagger)
 
 			for _, url := range urls {
 				Expect(url).To(BeElementOf(urls))
 			}
+		})
+
+		It("should not attempt to tag the feed on error", func() {
+			fnCalled := 0
+			withGet(func(url string) (model.Feed, error) {
+				return fakeFeed(), errors.New("Fake error")
+			}, fakePut, func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+				fnCalled++
+				return fakeFeed(), nil
+			})
+
+			Expect(fnCalled).To(Equal(0))
+		})
+
+		It("should not put to the database on error", func() {
+			fnCalled := 0
+			withGet(func(url string) (model.Feed, error) {
+				return fakeFeed(), errors.New("Fake error")
+			}, func(url string, feed model.Feed) interface{} {
+				fnCalled++
+				return nil
+			}, fakeTagger)
+
+			Expect(fnCalled).To(Equal(0))
 		})
 	})
 })
