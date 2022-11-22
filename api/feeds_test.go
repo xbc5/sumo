@@ -81,11 +81,12 @@ var _ = Describe("saveFeeds", func() {
 		It("should try to fetch two items", func() {
 			a, stubs := newAPI()
 			fetched := []string{}
-
 			a.FetchFeed = func(url string) (model.Feed, error) {
 				fetched = append(fetched, url)
 				return stubs.Feed, nil
 			}
+
+			a.UpdateFeeds(5)
 
 			Expect(fetched).To(HaveLen(len(stubs.URLs)))
 		})
