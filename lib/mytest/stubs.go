@@ -26,10 +26,11 @@ type StubData struct {
 }
 
 func GetStubData() StubData {
+	f := fakeFeed()
 	return StubData{
 		URLs:     []string{"https://fake1.com", "https://fake2.com", "https://fake3.com"},
-		Articles: fakeArticles(),
-		Feed:     fakeFeed(),
+		Articles: f.Articles,
+		Feed:     f,
 	}
 }
 
@@ -47,7 +48,7 @@ func fakePatterns() []model.Pattern {
 }
 
 func fakeFeed() model.Feed {
-	return FakeFeed(1, fakeTags(), GetStubData().Articles)
+	return FakeFeed(1, fakeTags(), fakeArticles())
 }
 
 func TagStub(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
