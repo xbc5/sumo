@@ -96,65 +96,66 @@ func Get(url string) (model.Feed, error) {
 	return feed, err
 }
 
-type Feeds struct {
-	GetPatterns func() ([]model.Pattern, error)
-	OnErr       func(msg string, err error)
-	Get         func(string) (model.Feed, error)
-	Put         func(url string, feed model.Feed)
-	Threads     int
+func sendJobs(ch chan string, jobs []string) chan string {
+	for _, j := range jobs {
+		ch <- j
+	}
+	close(ch)
+	return ch
 }
 
-func (this *Feeds) worker(jobs <-chan string, results chan<- model.Feed, wg *sync.WaitGroup) {
-	for url := range jobs {
-		f, err := this.Get(url)
+type (
+	getFn   func(url string) (model.Feed, error)
+	tagFn   func(feed model.Feed, patterns []model.Pattern) (model.Feed, error)
+	putFn   func(url string, feed model.Feed) *interface{} // we don't care about the return type
+	onErrFn func(msg string, err error) interface{}
+)
+
+func saveFeedsWorker(
+	wg *sync.WaitGroup,
+	pool chan string,
+	pat []model.Pattern,
+	get getFn,
+	tag tagFn,
+	put putFn,
+	onErr onErrFn,
+) {
+	for url := range pool {
+		f, err := get(url)
 		if err != nil {
-			this.OnErr("Cannot fetch feed", err)
-			wg.Done() // remove this if doing retry logic
+			onErr("Cannot fetch feed", err)
+			wg.Done()
 			continue
 		}
-
-		pat, err := this.GetPatterns()
+		tagged, err := tag(f, pat)
 		if err != nil {
-			this.OnErr("Cannot fetch patterns", err)
-			wg.Done() // remove this if doing retry logic
+			onErr("Cannot tag feed", err)
+			wg.Done()
 			continue
 		}
-
-		f, err = Tag(f, pat)
-		if err != nil {
-			this.OnErr("Cannot tag feed", err)
-			wg.Done() // remove this if doing retry logic
-			continue
-		}
-
-		results <- f
+		put(url, tagged)
 		wg.Done()
 	}
 }
 
-func (this *Feeds) Save(
+func saveFeeds(
 	urls []string,
-) *sync.WaitGroup {
-	jobs := make(chan string)
-	results := make(chan model.Feed)
+	pat []model.Pattern,
+	threads int,
+	get getFn,
+	tag tagFn,
+	put putFn,
+	onErr onErrFn,
+) {
+	ch := make(chan string)
+	go sendJobs(ch, urls)
 
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
 
-	for i := 0; i < this.Threads; i++ {
-		go this.worker(jobs, results, &wg)
+	for t := 1; t <= threads; t++ {
+		go saveFeedsWorker(&wg, ch, pat, get, tag, put, onErr)
 	}
 
-	// receive
-	for result := range results {
-		this.Put(result.URL, result)
-	}
-
-	// send
-	for _, url := range urls {
-		jobs <- url
-	}
-	close(jobs)
-
-	return &wg
+	wg.Wait()
 }
