@@ -86,6 +86,7 @@ var _ = Describe("saveFeeds", func() {
 				fetched = append(fetched, url)
 				return stubs.Feed, nil
 			}
+			a.UpdateFeeds(5)
 
 			Expect(fetched).To(HaveLen(len(stubs.URLs)))
 		})
