@@ -29,6 +29,7 @@ func (this *API) saveFeedsWorker(
 	for url := range pool {
 		f, err := this.FetchFeed(url)
 		if err != nil {
+			this.OnFetchErr(url, err)
 			wg.Done()
 			continue
 		}

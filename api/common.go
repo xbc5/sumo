@@ -7,6 +7,7 @@ import (
 	"github.com/xbc5/sumo/lib/database/model"
 	"github.com/xbc5/sumo/lib/feed"
 	"github.com/xbc5/sumo/lib/log"
+	"github.com/xbc5/sumo/lib/errs"
 	"github.com/xbc5/sumo/lib/mytest"
 	"gorm.io/gorm"
 )
@@ -16,6 +17,7 @@ type API struct {
 	DSN         string
 	Config      config.Config
 	OnDBErr     func(err error) *zerolog.Event
+	OnFetchErr  func(msg string, err error)
 	GetPatterns func(db *gorm.DB) ([]model.Pattern, error)
 	GetFeedUrls func(db *gorm.DB) ([]string, error)
 	FetchFeed   func(url string) (model.Feed, error)
@@ -27,6 +29,7 @@ func (this *API) New() *API {
 	this.DSN = "file"
 	this.Config = config.GetConfig()
 	this.OnDBErr = log.DbErr
+	this.OnFetchErr = errs.OnFetchErr
 	this.GetPatterns = db.GetAllPatterns
 	this.GetFeedUrls = db.GetFeedURLs
 	this.FetchFeed = feed.Get
@@ -49,6 +52,7 @@ func (this *API) New() *API {
 
 func (this *API) NewTest(realDb bool) (*API, mytest.StubData) {
 	this.OnDBErr = mytest.OnDbErrStub
+	this.OnFetchErr = mytest.OnFetchErrStub
 	this.Config = config.GetConfig()
 	this.GetFeedUrls = mytest.GetFeedUrlsStub
 	this.FetchFeed = mytest.GetFeedStub

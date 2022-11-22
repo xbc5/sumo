@@ -85,6 +85,8 @@ func OnDbErrStub(err error) *zerolog.Event {
 	return fakeLogger()
 }
 
+func OnFetchErrStub(url string, err error) {}
+
 func FakeTagger(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
 	return feed, nil
 }

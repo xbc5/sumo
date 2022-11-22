@@ -47,6 +47,19 @@ var _ = Describe("saveFeeds", func() {
 			Expect(fnCalled).To(Equal(0))
 		})
 
+		It("should emit an error when fetch errors", func() {
+			fnCalled := 0
+			a, stubs := newAPI()
+			a.FetchFeed = t.GetFeedErrStub
+			a.OnFetchErr = func(msg string, err error) {
+				fnCalled++
+			}
+
+			a.UpdateFeeds()
+
+			Expect(fnCalled).To(Equal(len(stubs.URLs)))
+		})
+
 		It("should not put to the database on error", func() {
 			fnCalled := 0
 			a, _ := newAPI()
