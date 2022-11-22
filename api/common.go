@@ -42,26 +42,28 @@ func (this *API) New() *API {
 	return this
 }
 
-func (this *API) NewTest(realDb bool) *API {
+func (this *API) NewTest(realDb bool) (*API, mytest.StubData) {
 	this.OnDBErr = mytest.OnDbErrStub
 	this.GetFeedUrls = mytest.GetFeedUrlsStub
 	this.GetPatterns = mytest.GetPatternsStub
 	this.TagFeed = mytest.TagStub
 	this.SaveFeed = mytest.UpdateFeedStub
 
+	stubData := mytest.GetStubData()
+
 	if realDb {
 		this.DSN = "memory"
 		d, err := db.Open(this.DSN, nil)
 		if err != nil {
 			this.OnDBErr(err).Msg("Cannot connect to the database")
-			return this
+			return this, stubData
 		}
 		err = db.AutoMigrate(d)
 		if err != nil {
 			this.OnDBErr(err).Msg("Cannot connect to the database")
-			return this
+			return this, stubData
 		}
 		this.db = d
 	}
-	return this
+	return this, stubData
 }

@@ -19,8 +19,14 @@ func fakeArticles() []model.Article {
 	}
 }
 
-func fakeUrls() []string {
-	return []string{"https://fake1.com", "https://fake2.com", "https://fake3.com"}
+type StubData struct {
+	URLs []string
+}
+
+func GetStubData() StubData {
+	return StubData{
+		URLs: []string{"https://fake1.com", "https://fake2.com", "https://fake3.com"},
+	}
 }
 
 func fakeLogger() *zerolog.Event {
@@ -53,7 +59,7 @@ func GetFeedStub(url string) (model.Feed, error) {
 }
 
 func GetFeedUrlsStub(db *gorm.DB) ([]string, error) {
-	return fakeUrls(), nil
+	return GetStubData().URLs, nil
 }
 
 func TagsStub() []string {
