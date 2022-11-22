@@ -14,8 +14,9 @@ type API struct {
 	db          *gorm.DB
 	DSN         string
 	OnDBErr     func(err error) *zerolog.Event
-	GetFeedUrls func(db *gorm.DB) ([]string, error)
 	GetPatterns func(db *gorm.DB) ([]model.Pattern, error)
+	GetFeedUrls func(db *gorm.DB) ([]string, error)
+	FetchFeed   func(url string) (model.Feed, error)
 	TagFeed     func(feed model.Feed, patterns []model.Pattern) (model.Feed, error)
 	SaveFeed    func(db *gorm.DB, feed model.Feed) error
 }
@@ -23,8 +24,9 @@ type API struct {
 func (this *API) New() *API {
 	this.DSN = "file"
 	this.OnDBErr = log.DbErr
-	this.GetFeedUrls = db.GetFeedURLs
 	this.GetPatterns = db.GetAllPatterns
+	this.GetFeedUrls = db.GetFeedURLs
+	this.FetchFeed = feed.Get
 	this.TagFeed = feed.Tag
 	this.SaveFeed = db.UpdateFeed
 
@@ -45,6 +47,7 @@ func (this *API) New() *API {
 func (this *API) NewTest(realDb bool) (*API, mytest.StubData) {
 	this.OnDBErr = mytest.OnDbErrStub
 	this.GetFeedUrls = mytest.GetFeedUrlsStub
+	this.FetchFeed = mytest.GetFeedStub
 	this.GetPatterns = mytest.GetPatternsStub
 	this.TagFeed = mytest.TagStub
 	this.SaveFeed = mytest.UpdateFeedStub
