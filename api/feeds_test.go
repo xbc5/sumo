@@ -78,7 +78,7 @@ func newAPI() (api.API, mytest.StubData) {
 
 var _ = Describe("saveFeeds", func() {
 	Context("the feed.Get function", func() {
-		It("should try to fetch two items", func() {
+		It("should be called with expected URLs", func() {
 			a, stubs := newAPI()
 			fetched := []string{}
 			a.FetchFeed = func(url string) (model.Feed, error) {
@@ -89,42 +89,34 @@ var _ = Describe("saveFeeds", func() {
 			a.UpdateFeeds()
 
 			Expect(fetched).To(HaveLen(len(stubs.URLs)))
-		})
-
-		/* It("should be called with expected URLs", func() {
-			fetched := []string{}
-			urls := withGet(func(url string) (model.Feed, error) {
-				fetched = append(fetched, url)
-				return fakeFeed(), nil
-			}, fakePut, fakeTagger)
-
-			for _, url := range urls {
-				Expect(url).To(BeElementOf(urls))
+			for _, url := range stubs.URLs {
+				Expect(url).To(BeElementOf(fetched))
 			}
 		})
 
-		It("should not attempt to tag the feed on error", func() {
-			fnCalled := 0
-			withGet(
-				fakeGetErr,
-				fakePut,
-				func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+		/*
+			It("should not attempt to tag the feed on error", func() {
+				fnCalled := 0
+				withGet(
+					fakeGetErr,
+					fakePut,
+					func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+						fnCalled++
+						return fakeFeed(), nil
+					},
+				)
+
+				Expect(fnCalled).To(Equal(0))
+			})
+
+			It("should not put to the database on error", func() {
+				fnCalled := 0
+				withGet(fakeGetErr, func(url string, feed model.Feed) interface{} {
 					fnCalled++
-					return fakeFeed(), nil
-				},
-			)
+					return nil
+				}, fakeTagger)
 
-			Expect(fnCalled).To(Equal(0))
-		})
-
-		It("should not put to the database on error", func() {
-			fnCalled := 0
-			withGet(fakeGetErr, func(url string, feed model.Feed) interface{} {
-				fnCalled++
-				return nil
-			}, fakeTagger)
-
-			Expect(fnCalled).To(Equal(0))
-		}) */
+				Expect(fnCalled).To(Equal(0))
+			}) */
 	})
 })
