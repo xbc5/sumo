@@ -1,6 +1,6 @@
 package database
 
-import "github.com/xbc5/sumo/pkg/database/model"
+import "github.com/xbc5/sumo/lib/database/model"
 
 func (this *DB) AddPattern(pattern model.Pattern) error {
 	return this.Conn.Create(&pattern).Error

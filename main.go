@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/xbc5/sumo/pkg/database"
+	"github.com/xbc5/sumo/lib/database"
 )
 
 func main() {

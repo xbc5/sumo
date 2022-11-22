@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"github.com/mmcdole/gofeed"
-	"github.com/xbc5/sumo/pkg/database/model"
-	"github.com/xbc5/sumo/pkg/log"
+	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/lib/log"
 )
 
 func makeFeed(gf *gofeed.Feed) model.Feed {

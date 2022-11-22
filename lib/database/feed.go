@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/xbc5/sumo/pkg/database/model"
+	"github.com/xbc5/sumo/lib/database/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

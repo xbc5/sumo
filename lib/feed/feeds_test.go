@@ -5,9 +5,9 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/xbc5/sumo/pkg/database/model"
-	"github.com/xbc5/sumo/pkg/feed"
-	"github.com/xbc5/sumo/pkg/mytest"
+	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/lib/feed"
+	"github.com/xbc5/sumo/lib/mytest"
 )
 
 func fakeAricles() []model.Article {

@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 
-	"github.com/xbc5/sumo/pkg/database/model"
-	"github.com/xbc5/sumo/pkg/log"
+	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/lib/log"
 )
 
 func SupportsFTS5(db *sql.DB) (bool, error) {
