@@ -107,7 +107,7 @@ func sendJobs(ch chan string, jobs []string) chan string {
 type (
 	getFn   func(url string) (model.Feed, error)
 	tagFn   func(feed model.Feed, patterns []model.Pattern) (model.Feed, error)
-	putFn   func(url string, feed model.Feed) *interface{} // we don't care about the return type
+	putFn   func(url string, feed model.Feed) interface{} // we don't care about the return type
 	onErrFn func(msg string, err error) interface{}
 )
 

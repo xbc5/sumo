@@ -25,35 +25,52 @@ func fakePatterns() []model.Pattern {
 	return []model.Pattern{mytest.FakePattern(1, "ignored", []string{"ignored1"})}
 }
 
+func fakeGet(url string) (model.Feed, error) {
+	return mytest.FakeFeed(1, fakeTags(), fakeAricles()), nil
+}
+
 func fakeTags() []string {
 	return []string{"ignored1", "ignored2"}
 }
 
-func feeds() feed.Feeds {
-	return feed.Feeds{
-		Threads: 2,
-		OnErr:   func(msg string, err error) {},
-		GetPatterns: func() ([]model.Pattern, error) {
-			return fakePatterns(), nil
-		},
-		Get: func(url string) (model.Feed, error) {
-			return mytest.FakeFeed(1, fakeTags(), fakeAricles()), nil
-		},
-		Put: func(url string, feed model.Feed) {},
-	}
+func fakeFeed() model.Feed {
+	return mytest.FakeFeed(1, fakeTags(), fakeAricles())
 }
 
-var _ = Describe("Feeds", func() {
-	Context("", func() {
-		It("should put", func() {
-			f := feeds()
-			called := 0
-			f.Put = func(_ string, _ model.Feed) {
-				called++
-			}
-			wg := f.Save([]string{"one", "two", "three", "four", "five"})
-			wg.Wait()
-			Expect(called).To(Equal(5))
+func fakePut(url string, feed model.Feed) interface{} {
+	return nil
+}
+
+func fakeOnErr(msg string, err error) interface{} {
+	return nil
+}
+
+func fakeTagger(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+	return feed, nil
+}
+
+func withGet(getFn func(url string) (model.Feed, error)) {
+	feed.SaveFeedsX(
+		[]string{"https://one.com", "https://two.com"},
+		fakePatterns(),
+		2,
+		getFn,
+		fakeTagger,
+		fakePut,
+		fakeOnErr,
+	)
+}
+
+var _ = Describe("saveFeeds", func() {
+	Context("given a fake feed.Get function", func() {
+		It("should be called fetch two items", func() {
+			fetched := []string{}
+			withGet(func(url string) (model.Feed, error) {
+				fetched = append(fetched, url)
+				return fakeFeed(), nil
+			})
+
+			Expect(fetched).To(HaveLen(2))
 		})
 	})
 })
