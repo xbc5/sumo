@@ -20,12 +20,16 @@ func fakeArticles() []model.Article {
 }
 
 type StubData struct {
-	URLs []string
+	URLs     []string
+	Articles []model.Article
+	Feed     model.Feed
 }
 
 func GetStubData() StubData {
 	return StubData{
-		URLs: []string{"https://fake1.com", "https://fake2.com", "https://fake3.com"},
+		URLs:     []string{"https://fake1.com", "https://fake2.com", "https://fake3.com"},
+		Articles: fakeArticles(),
+		Feed:     fakeFeed(),
 	}
 }
 
@@ -43,11 +47,11 @@ func fakePatterns() []model.Pattern {
 }
 
 func fakeFeed() model.Feed {
-	return FakeFeed(1, fakeTags(), fakeArticles())
+	return FakeFeed(1, fakeTags(), GetStubData().Articles)
 }
 
 func TagStub(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
-	return fakeFeed(), nil
+	return GetStubData().Feed, nil
 }
 
 func GetPatternsStub(db *gorm.DB) ([]model.Pattern, error) {
@@ -55,7 +59,7 @@ func GetPatternsStub(db *gorm.DB) ([]model.Pattern, error) {
 }
 
 func GetFeedStub(url string) (model.Feed, error) {
-	return fakeFeed(), nil
+	return GetStubData().Feed, nil
 }
 
 func GetFeedUrlsStub(db *gorm.DB) ([]string, error) {

@@ -1,8 +1,6 @@
 package api_test
 
 import (
-	"errors"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/xbc5/sumo/api"
@@ -10,7 +8,7 @@ import (
 	"github.com/xbc5/sumo/lib/mytest"
 )
 
-func fakeAricles() []model.Article {
+/* func fakeAricles() []model.Article {
 	return []model.Article{
 		mytest.FakeArticle(
 			1,
@@ -70,21 +68,29 @@ func withGet(
 		putFn,
 	)
 	return urls
+} */
+
+func newAPI() (api.API, mytest.StubData) {
+	api := api.API{}
+	new, stubData := api.NewTest(false)
+	return *new, stubData
 }
 
 var _ = Describe("saveFeeds", func() {
 	Context("the feed.Get function", func() {
 		It("should try to fetch two items", func() {
+			a, stubs := newAPI()
 			fetched := []string{}
-			urls := withGet(func(url string) (model.Feed, error) {
-				fetched = append(fetched, url)
-				return fakeFeed(), nil
-			}, fakePut, fakeTagger)
 
-			Expect(fetched).To(HaveLen(len(urls)))
+			a.FetchFeed = func(url string) (model.Feed, error) {
+				fetched = append(fetched, url)
+				return stubs.Feed, nil
+			}
+
+			Expect(fetched).To(HaveLen(len(stubs.URLs)))
 		})
 
-		It("should be called with expected URLs", func() {
+		/* It("should be called with expected URLs", func() {
 			fetched := []string{}
 			urls := withGet(func(url string) (model.Feed, error) {
 				fetched = append(fetched, url)
@@ -118,6 +124,6 @@ var _ = Describe("saveFeeds", func() {
 			}, fakeTagger)
 
 			Expect(fnCalled).To(Equal(0))
-		})
+		}) */
 	})
 })
