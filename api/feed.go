@@ -46,9 +46,7 @@ func (this *API) saveFeedsWorker(
 	}
 }
 
-func (this *API) UpdateFeeds(
-	threads int,
-) {
+func (this *API) UpdateFeeds() {
 	urls, _ := this.GetFeedUrls(this.db) // FIXME handle error
 	pat, _ := this.GetPatterns(this.db)  // FIXME handle error
 
@@ -58,6 +56,7 @@ func (this *API) UpdateFeeds(
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
 
+	threads := this.Config.Fetch.Threads
 	for t := 1; t <= threads; t++ {
 		go this.saveFeedsWorker(&wg, ch, pat)
 	}
