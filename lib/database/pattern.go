@@ -1,14 +1,17 @@
 package database
 
-import "github.com/xbc5/sumo/lib/database/model"
+import (
+	"github.com/xbc5/sumo/lib/database/model"
+	"gorm.io/gorm"
+)
 
-func (this *DB) AddPattern(pattern model.Pattern) error {
-	return this.Conn.Create(&pattern).Error
+func AddPattern(db *gorm.DB, pattern model.Pattern) error {
+	return db.Create(&pattern).Error
 }
 
-func (this *DB) GetAllPatterns() ([]model.Pattern, error) {
+func GetAllPatterns(db *gorm.DB) ([]model.Pattern, error) {
 	var results []model.Pattern
 	pattern := model.Pattern{}
-	err := this.Conn.Model(&pattern).Preload("Tags").Find(&results).Error
+	err := db.Model(&pattern).Preload("Tags").Find(&results).Error
 	return results, err
 }
