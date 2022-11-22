@@ -6,24 +6,22 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (this *DB) AddFeedURL(url string) *DB {
+func AddFeedURL(db *gorm.DB, url string) error {
 	record := model.Feed{URL: url}
-	this.Conn.Clauses(
+	return db.Clauses(
 		clause.OnConflict{DoNothing: true},
-	).Create(&record)
-	return this
+	).Create(&record).Error
 }
 
-func (this *DB) GetFeedURLs() []string {
+func GetFeedURLs(db *gorm.DB) ([]string, error) {
 	var feeds []*model.Feed
-	this.Conn.Select("url").Find(&feeds)
-	return ToFeedUrls(&feeds)
+	err := db.Select("url").Find(&feeds).Error
+	return ToFeedUrls(&feeds), err
 }
 
-func (this *DB) UpdateFeed(url string, feed model.Feed) *DB {
-	this.Conn.
+func UpdateFeed(db *gorm.DB, feed model.Feed) error {
+	return db.
 		Session(&gorm.Session{FullSaveAssociations: true}).
-		Where("url = ?", url).
-		Create(&feed)
-	return this
+		Where("url = ?", feed.URL).
+		Create(&feed).Error
 }
