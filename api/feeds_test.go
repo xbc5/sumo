@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/xbc5/sumo/api"
 	"github.com/xbc5/sumo/lib/database/model"
-	"github.com/xbc5/sumo/lib/mytest"
+	t "github.com/xbc5/sumo/lib/mytest"
 )
 
 /* func fakeAricles() []model.Article {
@@ -70,7 +70,7 @@ func withGet(
 	return urls
 } */
 
-func newAPI() (api.API, mytest.StubData) {
+func newAPI() (api.API, t.StubData) {
 	api := api.API{}
 	new, stubData := api.NewTest(false)
 	return *new, stubData
@@ -94,21 +94,20 @@ var _ = Describe("saveFeeds", func() {
 			}
 		})
 
+		It("should not attempt to tag the feed on error", func() {
+			fnCalled := 0
+
+			a, stubs := newAPI()
+			a.FetchFeed = t.GetFeedErrStub
+			a.TagFeed = func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+				fnCalled++
+				return stubs.Feed, nil
+			}
+
+			Expect(fnCalled).To(Equal(0))
+		})
+
 		/*
-			It("should not attempt to tag the feed on error", func() {
-				fnCalled := 0
-				withGet(
-					fakeGetErr,
-					fakePut,
-					func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
-						fnCalled++
-						return fakeFeed(), nil
-					},
-				)
-
-				Expect(fnCalled).To(Equal(0))
-			})
-
 			It("should not put to the database on error", func() {
 				fnCalled := 0
 				withGet(fakeGetErr, func(url string, feed model.Feed) interface{} {

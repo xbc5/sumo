@@ -1,6 +1,8 @@
 package mytest
 
 import (
+	"errors"
+
 	"github.com/rs/zerolog"
 	"github.com/xbc5/sumo/lib/database/model"
 	"gorm.io/gorm"
@@ -61,6 +63,10 @@ func GetPatternsStub(db *gorm.DB) ([]model.Pattern, error) {
 
 func GetFeedStub(url string) (model.Feed, error) {
 	return GetStubData().Feed, nil
+}
+
+func GetFeedErrStub(url string) (model.Feed, error) {
+	return GetStubData().Feed, errors.New("Stub feed fetch error")
 }
 
 func GetFeedUrlsStub(db *gorm.DB) ([]string, error) {
