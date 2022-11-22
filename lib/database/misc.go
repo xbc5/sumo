@@ -22,8 +22,8 @@ func AutoMigrate(db *gorm.DB) (err error) {
 	return err
 }
 
-func Open(db *gorm.DB, dsn string, conf *gorm.Config) (*gorm.DB, error) {
-	var _dsn string
+func Open(dsn string, conf *gorm.Config) (*gorm.DB, error) {
+  _dsn := dsn
 	if dsn == "memory" {
 		_dsn = ":memory:"
 	} else if dsn == "file" {

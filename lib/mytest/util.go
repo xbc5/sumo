@@ -6,15 +6,16 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func OpenDB() database.DB {
-	// WARN: you must explicitly close the DB after every test
-	// SQLite creates a new database for every connection if using :memory:,
-	// which provides isolation between tests.
-	db := database.DB{
-		DSN: "memory",
-		Config: &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Silent),
-		}}
-	db.Open().AutoMigrate()
+func OpenDB() *gorm.DB {
+	db, err := database.Open("memory", &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+	if err != nil {
+		panic("Cannot open database")
+	}
+	err = database.AutoMigrate(db)
+	if err != nil {
+		panic("AutoMigrate failed")
+	}
 	return db
 }
