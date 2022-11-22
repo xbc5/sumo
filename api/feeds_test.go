@@ -9,68 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-/* func fakeAricles() []model.Article {
-	return []model.Article{
-		mytest.FakeArticle(
-			1,
-			[]string{},
-			mytest.FakeAuthors([]string{"foo"}),
-			0,
-			0,
-			nil,
-		),
-	}
-}
-
-func fakePatterns() []model.Pattern {
-	return []model.Pattern{mytest.FakePattern(1, "ignored", []string{"ignored1"})}
-}
-
-func fakeGet(url string) (model.Feed, error) {
-	return fakeFeed(), nil
-}
-
-func fakeGetErr(url string) (model.Feed, error) {
-	return fakeFeed(), errors.New("Fake get error")
-}
-
-func fakeTags() []string {
-	return []string{"ignored1", "ignored2"}
-}
-
-func fakeFeed() model.Feed {
-	return mytest.FakeFeed(1, fakeTags(), fakeAricles())
-}
-
-func fakePut(url string, feed model.Feed) interface{} {
-	return nil
-}
-
-func fakeOnErr(msg string, err error) interface{} {
-	return nil
-}
-
-func fakeTagger(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
-	return feed, nil
-}
-
-func withGet(
-	getFn func(url string) (model.Feed, error),
-	putFn func(url string, feed model.Feed) interface{},
-	tagFn func(feed model.Feed, patterns []model.Pattern) (model.Feed, error),
-) []string {
-	urls := []string{"https://one.com", "https://two.com"}
-	api.SaveFeedsX(
-		urls,
-		fakePatterns(),
-		2,
-		getFn,
-		tagFn,
-		putFn,
-	)
-	return urls
-} */
-
 func newAPI() (api.API, t.StubData) {
 	api := api.API{}
 	new, stubData := api.NewTest(false)
