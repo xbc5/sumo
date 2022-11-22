@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/rs/zerolog"
+	"github.com/xbc5/sumo/lib/config"
 	db "github.com/xbc5/sumo/lib/database"
 	"github.com/xbc5/sumo/lib/database/model"
 	"github.com/xbc5/sumo/lib/feed"
@@ -13,6 +14,7 @@ import (
 type API struct {
 	db          *gorm.DB
 	DSN         string
+	Config      config.Config
 	OnDBErr     func(err error) *zerolog.Event
 	GetPatterns func(db *gorm.DB) ([]model.Pattern, error)
 	GetFeedUrls func(db *gorm.DB) ([]string, error)
@@ -23,6 +25,7 @@ type API struct {
 
 func (this *API) New() *API {
 	this.DSN = "file"
+	this.Config = config.GetConfig()
 	this.OnDBErr = log.DbErr
 	this.GetPatterns = db.GetAllPatterns
 	this.GetFeedUrls = db.GetFeedURLs
@@ -46,6 +49,7 @@ func (this *API) New() *API {
 
 func (this *API) NewTest(realDb bool) (*API, mytest.StubData) {
 	this.OnDBErr = mytest.OnDbErrStub
+	this.Config = config.GetConfig()
 	this.GetFeedUrls = mytest.GetFeedUrlsStub
 	this.FetchFeed = mytest.GetFeedStub
 	this.GetPatterns = mytest.GetPatternsStub
