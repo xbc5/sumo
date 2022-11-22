@@ -49,9 +49,13 @@ func fakeTagger(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
 	return feed, nil
 }
 
-func withGet(getFn func(url string) (model.Feed, error)) {
+func withGet(
+	getFn func(url string) (model.Feed, error),
+	onErr func(msg string, err error) interface{},
+) []string {
+	urls := []string{"https://one.com", "https://two.com"}
 	feed.SaveFeedsX(
-		[]string{"https://one.com", "https://two.com"},
+		urls,
 		fakePatterns(),
 		2,
 		getFn,
@@ -59,18 +63,31 @@ func withGet(getFn func(url string) (model.Feed, error)) {
 		fakePut,
 		fakeOnErr,
 	)
+	return urls
 }
 
 var _ = Describe("saveFeeds", func() {
-	Context("given a fake feed.Get function", func() {
-		It("should be called fetch two items", func() {
+	Context("the feed.Get function", func() {
+		It("should try to fetch two items", func() {
 			fetched := []string{}
-			withGet(func(url string) (model.Feed, error) {
+			urls := withGet(func(url string) (model.Feed, error) {
 				fetched = append(fetched, url)
 				return fakeFeed(), nil
-			})
+			}, fakeOnErr)
 
-			Expect(fetched).To(HaveLen(2))
+			Expect(fetched).To(HaveLen(len(urls)))
+		})
+
+		It("should be called with expected URLs", func() {
+			fetched := []string{}
+			urls := withGet(func(url string) (model.Feed, error) {
+				fetched = append(fetched, url)
+				return fakeFeed(), nil
+			}, fakeOnErr)
+
+			for _, url := range urls {
+				Expect(url).To(BeElementOf(urls))
+			}
 		})
 	})
 })
