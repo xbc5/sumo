@@ -22,12 +22,17 @@ func (this *DB) Open() *DB {
 	}
 
 	conn, err := gorm.Open(sqlite.Open(dsn), &conf)
-
 	if err != nil {
 		panic("failed to connect database") // FIXME logger
 	}
 
 	this.Conn = conn
 
+	return this
+}
+
+func (this *DB) Close() *DB {
+	sqlDB, _ := this.Conn.DB()
+	sqlDB.Close()
 	return this
 }

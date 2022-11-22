@@ -19,9 +19,3 @@ func (this *DB) AutoMigrate() *DB {
 	this.Conn.AutoMigrate(&model.Pattern{})
 	return this
 }
-
-func (this *DB) Close() *DB {
-	sqlDB, _ := this.Conn.DB()
-	sqlDB.Close()
-	return this
-}
