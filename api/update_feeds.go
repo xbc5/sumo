@@ -43,10 +43,10 @@ func sendJobs(ch chan string, jobs []string) chan string {
 }
 
 func (this *API) canUpdateFeed() bool {
+	this.updateFeedMutex.Lock()
 	if this.updateFeedInProgress {
 		return false
 	}
-	this.updateFeedMutex.Lock()
 	this.updateFeedInProgress = true
 	this.updateFeedMutex.Unlock()
 	return true
