@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/mmcdole/gofeed"
-	"github.com/xbc5/sumo/pkg/database/model"
-	"github.com/xbc5/sumo/pkg/log"
+	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/lib/log"
 )
 
 func makeFeed(gf *gofeed.Feed) model.Feed {
@@ -89,6 +89,7 @@ func Get(url string) (model.Feed, error) {
 		log.FeedGetErr(url, err)
 		feed = makeFeed(src)
 		feed.Articles = makeArticles(src.Items)
+		feed.URL = url // a lot of times the feed URL is absent, and this is a pain
 	}
 
 	return feed, err

@@ -41,11 +41,4 @@ func SchemaFatal(msg string, query string, err error) {
 
 func SchemaInfo(msg string, tableName string) {
 	log.Logger.Info().Str("kind", "schema").Str("table", tableName).Msg(msg)
-
-}
-
-func DbConnErr(msg string, err error) {
-	if err != nil {
-		log.Logger.Err(err).Str("kind", "connection").Msg(msg)
-	}
 }

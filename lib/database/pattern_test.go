@@ -4,8 +4,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/xbc5/sumo/pkg/database/model"
-	t "github.com/xbc5/sumo/pkg/mytest"
+	"github.com/xbc5/sumo/lib/database"
+	"github.com/xbc5/sumo/lib/database/model"
+	t "github.com/xbc5/sumo/lib/mytest"
 )
 
 func expectPatternTags(fixture model.Pattern, result model.Pattern, tagLen int) {
@@ -30,11 +31,11 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 			}
 
 			for _, f := range fixtures {
-				addErr := db.AddPattern(f)
+				addErr := database.AddPattern(db, f)
 				Expect(addErr).ShouldNot(HaveOccurred())
 			}
 
-			db.Close()
+			database.Close(db)
 		})
 	})
 
@@ -43,15 +44,15 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 			db := t.OpenDB()
 			pattern0 := t.FakePattern(0, ".pattern0.", []string{"tag0", "tag1"})
 
-			db.AddPattern(pattern0)
+			database.AddPattern(db, pattern0)
 
-			result, getErr := db.GetAllPatterns()
+			result, getErr := database.GetAllPatterns(db)
 			Expect(getErr).ShouldNot(HaveOccurred())
 
 			Expect(result).To(HaveLen(1))
 			expectPatternTags(pattern0, result[0], 2)
 
-			db.Close()
+			database.Close(db)
 		})
 	})
 
@@ -61,10 +62,10 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 			fixture0 := t.FakePattern(0, ".pattern0.", []string{"tag0", "tag1"})
 			fixture1 := t.FakePattern(1, ".pattern1.", []string{"tag1", "tag2", "tag3"})
 
-			db.AddPattern(fixture0)
-			db.AddPattern(fixture1)
+			database.AddPattern(db, fixture0)
+			database.AddPattern(db, fixture1)
 
-			result, getErr := db.GetAllPatterns()
+			result, getErr := database.GetAllPatterns(db)
 			Expect(getErr).ShouldNot(HaveOccurred())
 
 			Expect(result).To(HaveLen(2))
@@ -72,7 +73,7 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 			expectPatternTags(fixture0, result[0], 2)
 			expectPatternTags(fixture1, result[1], 3)
 
-			db.Close()
+			database.Close(db)
 		})
 	})
 
@@ -82,17 +83,17 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 			pattern0 := t.FakePattern(0, ".pattern0.", []string{"tag0", "tag1"})
 			pattern1 := t.FakePattern(0, ".pattern0.", []string{"tag0", "tag1"})
 
-			addErr := db.AddPattern(pattern0)
+			addErr := database.AddPattern(db, pattern0)
 			Expect(addErr).ShouldNot(HaveOccurred())
 
-			addErr = db.AddPattern(pattern1)
+			addErr = database.AddPattern(db, pattern1)
 			Expect(addErr).ShouldNot(HaveOccurred())
 
-			result, _ := db.GetAllPatterns()
+			result, _ := database.GetAllPatterns(db)
 
 			Expect(result).To(HaveLen(1))
 
-			db.Close()
+			database.Close(db)
 		})
 	})
 
@@ -103,10 +104,10 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 			pattern0 := t.FakePattern(0, ".pattern0.", []string{"tag0"})
 			pattern1 := t.FakePattern(0, ".pattern0.", []string{"tag1"})
 
-			db.AddPattern(pattern0)
-			db.AddPattern(pattern1)
+			database.AddPattern(db, pattern0)
+			database.AddPattern(db, pattern1)
 
-			result, _ := db.GetAllPatterns()
+			result, _ := database.GetAllPatterns(db)
 			tags := result[0].Tags
 			tag0 := tags[0].Name
 			tag1 := tags[1].Name
@@ -118,7 +119,7 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 
 			Expect(tag0).NotTo(Equal(tag1))
 
-			db.Close()
+			database.Close(db)
 		})
 	})
 })
