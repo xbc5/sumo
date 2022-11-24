@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.24.1
 	github.com/rs/zerolog v1.28.0
 	gorm.io/driver/sqlite v1.4.3
-	gorm.io/gorm v1.24.1
+	gorm.io/gorm v1.24.2
 )
 
 require (
