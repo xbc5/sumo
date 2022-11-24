@@ -3,7 +3,7 @@ package feed
 import (
 	"regexp"
 
-	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
 )
 
 func scanTexts(texts []string, patterns []model.Pattern) ([]string, error) {

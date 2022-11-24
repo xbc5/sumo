@@ -1,20 +1,20 @@
-package api
+package sumo
 
 import (
 	"sync"
 
 	"github.com/rs/zerolog"
-	"github.com/xbc5/sumo/lib/config"
-	db "github.com/xbc5/sumo/lib/database"
-	"github.com/xbc5/sumo/lib/database/model"
-	"github.com/xbc5/sumo/lib/errs"
-	"github.com/xbc5/sumo/lib/feed"
-	"github.com/xbc5/sumo/lib/log"
-	"github.com/xbc5/sumo/lib/mytest"
+	"github.com/xbc5/sumo/internal/pkg/config"
+	db "github.com/xbc5/sumo/internal/pkg/database"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/errs"
+	"github.com/xbc5/sumo/internal/pkg/feed"
+	"github.com/xbc5/sumo/internal/pkg/log"
+	"github.com/xbc5/sumo/internal/pkg/mytest"
 	"gorm.io/gorm"
 )
 
-type API struct {
+type Sumo struct {
 	db                   *gorm.DB
 	updateFeedMutex      sync.Mutex
 	updateFeedInProgress bool
@@ -29,7 +29,7 @@ type API struct {
 	SaveFeed             func(db *gorm.DB, feed model.Feed) error
 }
 
-func (this *API) New() *API {
+func (this *Sumo) New() *Sumo {
 	this.DSN = "file"
 	this.Config = config.GetConfig()
 	this.OnDBErr = log.DbErr
@@ -54,7 +54,7 @@ func (this *API) New() *API {
 	return this
 }
 
-func (this *API) NewTest(realDb bool) (*API, mytest.StubData) {
+func (this *Sumo) NewTest(realDb bool) (*Sumo, mytest.StubData) {
 	this.OnDBErr = mytest.OnDbErrStub
 	this.OnFetchErr = mytest.OnFetchErrStub
 	this.Config = config.GetConfig()

@@ -3,7 +3,7 @@ package mytest
 import (
 	"fmt"
 
-	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
 )
 
 func FakePattern(suffix uint, pattern string, tags []string) model.Pattern {

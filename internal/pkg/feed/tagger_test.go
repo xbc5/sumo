@@ -3,9 +3,9 @@ package feed_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/xbc5/sumo/lib/database/model"
-	"github.com/xbc5/sumo/lib/feed"
-	t "github.com/xbc5/sumo/lib/mytest"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/feed"
+	t "github.com/xbc5/sumo/internal/pkg/mytest"
 )
 
 func noTags() model.Feed {

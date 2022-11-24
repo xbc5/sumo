@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/mmcdole/gofeed"
-	"github.com/xbc5/sumo/lib/database/model"
-	"github.com/xbc5/sumo/lib/log"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/log"
 )
 
 func makeFeed(gf *gofeed.Feed) model.Feed {

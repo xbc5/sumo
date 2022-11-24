@@ -4,9 +4,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/xbc5/sumo/lib/database"
-	"github.com/xbc5/sumo/lib/database/model"
-	t "github.com/xbc5/sumo/lib/mytest"
+	"github.com/xbc5/sumo/internal/pkg/database"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
+	t "github.com/xbc5/sumo/internal/pkg/mytest"
 )
 
 func expectPatternTags(fixture model.Pattern, result model.Pattern, tagLen int) {

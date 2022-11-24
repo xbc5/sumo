@@ -1,13 +1,13 @@
-package api
+package sumo
 
 import (
 	"errors"
 	"sync"
 
-	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
 )
 
-func (this *API) updateFeedsWorker(
+func (this *Sumo) updateFeedsWorker(
 	wg *sync.WaitGroup,
 	pool chan string,
 	pat []model.Pattern,
@@ -42,7 +42,7 @@ func sendJobs(ch chan string, jobs []string) chan string {
 	return ch
 }
 
-func (this *API) canUpdateFeed() bool {
+func (this *Sumo) canUpdateFeed() bool {
 	this.updateFeedMutex.Lock()
 	if this.updateFeedInProgress {
 		return false
@@ -52,7 +52,7 @@ func (this *API) canUpdateFeed() bool {
 	return true
 }
 
-func (this *API) UpdateFeeds() error {
+func (this *Sumo) UpdateFeeds() error {
 	if !this.canUpdateFeed() {
 		return errors.New("Multiple UpdateFeeds() detected") // TODO log error
 	}

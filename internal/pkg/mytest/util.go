@@ -1,7 +1,7 @@
 package mytest
 
 import (
-	"github.com/xbc5/sumo/lib/database"
+	"github.com/xbc5/sumo/internal/pkg/database"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

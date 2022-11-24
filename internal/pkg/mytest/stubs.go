@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/rs/zerolog"
-	"github.com/xbc5/sumo/lib/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/model"
 	"gorm.io/gorm"
 )
 
