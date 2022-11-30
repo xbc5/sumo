@@ -23,6 +23,12 @@ func (this Server) Start() {
 	}
 }
 
+func (this *Server) New() *Server {
+	build := ServerBuilder{Server: this}
+	server := build.CheckOrigin(CheckOrigin).Build()
+	return server
+}
+
 func (this *Server) NewTest() ServerBuilder {
 	return ServerBuilder{Server: this}
 }
