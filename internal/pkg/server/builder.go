@@ -6,14 +6,14 @@ type ServerBuilder struct {
 }
 
 func (this *ServerBuilder) CheckOrigin(fn TCheckOrigin) *ServerBuilder {
-	this.Server.CheckOrigin = fn
+	this.Server.checkOrigin = fn
 	this.checkOrigin = true
 	return this
 }
 
 func (this ServerBuilder) Build() *Server {
 	if !this.checkOrigin {
-		this.Server.CheckOrigin = CheckOriginStub
+		this.Server.checkOrigin = CheckOriginStub
 	}
 	return this.Server
 }

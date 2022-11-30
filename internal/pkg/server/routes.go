@@ -18,7 +18,7 @@ var upgrader = websocket.Upgrader{
 
 func (this Server) handleWs(res http.ResponseWriter, req *http.Request) {
 	conn, err := upgrader.Upgrade(res, req, nil)
-	upgrader.CheckOrigin = this.CheckOrigin
+	upgrader.CheckOrigin = this.checkOrigin
 	if err != nil {
 		fmt.Printf("WebSocket connection error") // TODO: log error
 	}

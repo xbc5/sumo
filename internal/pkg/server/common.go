@@ -8,7 +8,7 @@ import (
 )
 
 type Server struct {
-	CheckOrigin TCheckOrigin
+	checkOrigin TCheckOrigin
 	Config      config.Config
 }
 
