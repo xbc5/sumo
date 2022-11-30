@@ -17,7 +17,9 @@ var _ = Describe("Common", func() {
 			s := serv().Build().StartTest()
 			c := s.Client()
 			defer s.Close()
+
 			_, err := c.Get(s.URL)
+
 			Expect(err).To(BeNil())
 		})
 
@@ -25,7 +27,9 @@ var _ = Describe("Common", func() {
 			s := serv().Build().StartTest()
 			c := s.Client()
 			defer s.Close()
+
 			res, _ := c.Get(s.URL)
+
 			Expect(res.StatusCode).To(Equal(200))
 		})
 	})
