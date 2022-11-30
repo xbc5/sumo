@@ -12,8 +12,8 @@ func serv() server.ServerBuilder {
 }
 
 var _ = Describe("Common", func() {
-	Context("when starting the server", func() {
-		It("should start", func() {
+	Context("after starting the server", func() {
+		It("should not error", func() {
 			s := serv().Build().StartTest()
 			c := s.Client()
 			defer s.Close()
