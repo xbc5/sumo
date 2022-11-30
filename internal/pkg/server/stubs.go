@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/gorilla/websocket"
+	"net/http"
 )
 
-func CheckOriginStub(conn *websocket.Conn) bool {
+func CheckOriginStub(req *http.Request) bool {
 	return true
 }

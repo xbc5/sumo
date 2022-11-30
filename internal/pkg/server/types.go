@@ -1,5 +1,7 @@
 package server
 
-import "github.com/gorilla/websocket"
+import (
+	"net/http"
+)
 
-type TCheckOrigin func(conn *websocket.Conn) bool
+type TCheckOrigin func(req *http.Request) bool
