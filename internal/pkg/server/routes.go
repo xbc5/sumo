@@ -25,6 +25,7 @@ func reader(conn *websocket.Conn) {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Printf("WS read error") // TODO log error
+			return
 		}
 		fmt.Printf(string(p))
 	}
