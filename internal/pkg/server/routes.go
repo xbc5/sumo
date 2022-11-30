@@ -16,26 +16,19 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func checkOrigin(req *http.Request) bool {
-	return true
-}
+func (this Server) handleWs(res http.ResponseWriter, req *http.Request) {
+	conn, err := upgrader.Upgrade(res, req, nil)
+	upgrader.CheckOrigin = CheckOrigin
+	if err != nil {
+		fmt.Printf("WebSocket connection error") // TODO: log error
+	}
 
-func reader(conn *websocket.Conn) {
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Printf("WS read error") // TODO log error
-			return
+			break
 		}
 		fmt.Printf(string(p))
 	}
-}
-
-func (this Server) handleWs(res http.ResponseWriter, req *http.Request) {
-	conn, err := upgrader.Upgrade(res, req, nil)
-	upgrader.CheckOrigin = checkOrigin
-	if err != nil {
-		fmt.Printf("WebSocket connection error") // TODO: log error
-	}
-	reader(conn)
 }
