@@ -3,13 +3,7 @@ package server_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/xbc5/sumo/internal/pkg/server"
 )
-
-func serv() server.ServerBuilder {
-	s := server.Server{}
-	return s.NewTest()
-}
 
 var _ = Describe("Common", func() {
 	Context("after starting the server and connecting a client to it", func() {
