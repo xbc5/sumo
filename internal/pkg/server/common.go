@@ -5,7 +5,9 @@ import (
 	"net/http"
 )
 
-type Server struct{}
+type Server struct {
+	CheckOrigin TCheckOrigin
+}
 
 func (this Server) Start() {
 	mux := http.NewServeMux()
@@ -15,4 +17,8 @@ func (this Server) Start() {
 	if err != nil {
 		fmt.Errorf("Cannot start server: %s", err)
 	}
+}
+
+func (this *Server) NewTest() ServerBuilder {
+	return ServerBuilder{Server: this}
 }
