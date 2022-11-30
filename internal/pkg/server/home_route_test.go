@@ -36,6 +36,8 @@ var _ = Describe("/", func() {
 		})
 
 		It("should return an expected result", func() {
+			// FIXME: mae test better:
+			// this just tests that a stub handler returns something; yet the real handler is untested
 			s := serv().Build().StartTest()
 			c := s.Client()
 			defer s.Close()
@@ -47,7 +49,7 @@ var _ = Describe("/", func() {
 			body, err := io.ReadAll(res.Body)
 
 			Expect(err).To(BeNil())
-			Expect(string(body)).To(Equal("test"))
+			Expect(string(body)).To(Equal("response stub"))
 		})
 	})
 })

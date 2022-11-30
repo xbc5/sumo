@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func (this Server) handleRoot(res http.ResponseWriter, req *http.Request) {
+func HandleRoot(res http.ResponseWriter, req *http.Request) {
 	fmt.Printf("root handled")
 }
 

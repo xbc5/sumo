@@ -11,6 +11,7 @@ import (
 type Server struct {
 	checkOrigin TCheckOrigin
 	Config      config.Server
+	handleRoot  http.HandlerFunc
 }
 
 func (this *Server) createHandler() *http.ServeMux {
@@ -37,7 +38,7 @@ func (this *Server) StartTest() *httptest.Server {
 func (this *Server) New() *Server {
 	this.Config = config.GetConfig().Server
 	build := ServerBuilder{Server: this}
-	server := build.CheckOrigin(CheckOrigin).Build()
+	server := build.CheckOrigin(CheckOrigin).HandleRoot(HandleRoot).Build()
 	return server
 }
 
