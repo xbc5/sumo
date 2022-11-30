@@ -19,7 +19,7 @@ func (this Server) Start() {
 
 	err := http.ListenAndServe(this.Config.Server.Address, mux)
 	if err != nil {
-		fmt.Errorf("Cannot start server: %s", err)
+		fmt.Errorf("Cannot start server: %s", err) // TODO log error
 	}
 }
 
