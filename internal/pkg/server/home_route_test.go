@@ -3,6 +3,7 @@ package server_test
 import (
 	"io"
 
+	"github.com/bradleyjkemp/cupaloy"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -49,7 +50,7 @@ var _ = Describe("/", func() {
 			body, err := io.ReadAll(res.Body)
 
 			Expect(err).To(BeNil())
-			Expect(string(body)).To(Equal("response stub"))
+			cupaloy.SnapshotT(GinkgoT(), body)
 		})
 	})
 })
