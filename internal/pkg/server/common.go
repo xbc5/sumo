@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 
 	"github.com/xbc5/sumo/internal/pkg/config"
 	"github.com/xbc5/sumo/internal/pkg/event"
@@ -13,6 +14,7 @@ type Server struct {
 	checkOrigin TCheckOrigin
 	Config      config.Server
 	Evt         event.IEvt[any]
+	wsWLock     sync.RWMutex
 
 	// the ID used to unsubscribe the WebSocket listener
 	wsSubId int

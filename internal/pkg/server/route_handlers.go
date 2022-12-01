@@ -32,7 +32,13 @@ const (
 func (this *Server) subWs() {
 	this.wsSubId = this.Evt.Sub(ResReady, func(ctx context.Context, msg any) {
 		conn := ctx.Value(connkey).(*websocket.Conn)
-		if conn.WriteJSON(msg) != nil {
+
+		// the event system uses goroutines; the docs say apps have locking responsibility
+		this.wsWLock.Lock()
+		err := conn.WriteJSON(msg)
+		this.wsWLock.Unlock()
+
+		if err != nil {
 			// errors when it can't get NextWriter, Encode, or Close
 			fmt.Printf("Cannot write JSON response") // TODO: log error
 		}
@@ -52,11 +58,13 @@ func (this *Server) handleWs(res http.ResponseWriter, req *http.Request) {
 
 	for {
 		var data *any
-		err := conn.ReadJSON(data)
+
+		err := conn.ReadJSON(data) // there only ever one reader, no need to lock
 		if err != nil {
 			fmt.Printf("WS read error") // TODO log error
 			break
 		}
+
 		this.Evt.Pub(ctx, WsRecv, *data)
 	}
 }
