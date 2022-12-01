@@ -11,7 +11,7 @@ import (
 //go:embed www/index.html
 var homePage string
 
-func HandleRoot(res http.ResponseWriter, req *http.Request) {
+func (this Server) handleRoot(res http.ResponseWriter, req *http.Request) {
 	fmt.Printf(homePage)
 }
 
