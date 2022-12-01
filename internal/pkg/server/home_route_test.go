@@ -37,8 +37,6 @@ var _ = Describe("/", func() {
 		})
 
 		It("should return an expected result", func() {
-			// FIXME: make test better:
-			// this just tests that a stub handler returns something; yet the real handler is untested
 			s := serv().Build().StartTest()
 			c := s.Client()
 			defer s.Close()

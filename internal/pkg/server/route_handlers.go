@@ -9,10 +9,12 @@ import (
 )
 
 //go:embed www/index.html
-var homePage string
+var homePage []byte
 
 func (this Server) handleRoot(res http.ResponseWriter, req *http.Request) {
-	fmt.Printf(homePage)
+	res.Header().Set("Content-Type", "text/html; charset=utf-8")
+	res.WriteHeader(http.StatusOK)
+	res.Write([]byte(homePage))
 }
 
 var upgrader = websocket.Upgrader{
