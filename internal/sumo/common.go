@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/xbc5/sumo/internal/pkg/config"
 	db "github.com/xbc5/sumo/internal/pkg/database"
-	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/dbmod"
 	"github.com/xbc5/sumo/internal/pkg/errs"
 	"github.com/xbc5/sumo/internal/pkg/feed"
 	"github.com/xbc5/sumo/internal/pkg/log"
@@ -22,11 +22,11 @@ type Sumo struct {
 	Config               config.Config
 	OnDBErr              func(err error) *zerolog.Event
 	OnFetchErr           func(msg string, err error)
-	GetPatterns          func(db *gorm.DB) ([]model.Pattern, error)
+	GetPatterns          func(db *gorm.DB) ([]dbmod.Pattern, error)
 	GetFeedUrls          func(db *gorm.DB) ([]string, error)
-	FetchFeed            func(url string) (model.Feed, error)
-	TagFeed              func(feed model.Feed, patterns []model.Pattern) (model.Feed, error)
-	SaveFeed             func(db *gorm.DB, feed model.Feed) error
+	FetchFeed            func(url string) (dbmod.Feed, error)
+	TagFeed              func(feed dbmod.Feed, patterns []dbmod.Pattern) (dbmod.Feed, error)
+	SaveFeed             func(db *gorm.DB, feed dbmod.Feed) error
 }
 
 func (this *Sumo) New() *Sumo {

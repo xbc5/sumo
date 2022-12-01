@@ -1,4 +1,4 @@
-package model
+package dbmod
 
 import (
 	"gorm.io/gorm"

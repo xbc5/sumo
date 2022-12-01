@@ -4,13 +4,13 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/dbmod"
 )
 
 func (this *Sumo) updateFeedsWorker(
 	wg *sync.WaitGroup,
 	pool chan string,
-	pat []model.Pattern,
+	pat []dbmod.Pattern,
 ) {
 	// FIXME: log errors? you might want to remove logging from individual funcs then
 	for url := range pool {
