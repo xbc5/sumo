@@ -6,6 +6,12 @@ import (
 	"sync"
 )
 
+type IEvt[T any] interface {
+	Sub(event string, fn func(ctx context.Context, msg T)) int
+	Unsub(id int) error
+	Pub(ctx context.Context, event string, msg T) *Evt[T]
+}
+
 type Evt[T any] struct {
 	subs  map[string]map[int]func(ctx context.Context, msg T)
 	cache map[int]string

@@ -14,6 +14,8 @@ func TestServer(t *testing.T) {
 }
 
 func serv() server.ServerBuilder {
-	s := server.Server{}
+	s := server.Server{
+    
+  }
 	return s.NewTest()
 }

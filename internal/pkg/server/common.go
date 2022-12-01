@@ -12,7 +12,7 @@ import (
 type Server struct {
 	checkOrigin TCheckOrigin
 	Config      config.Server
-	Evt         *event.Evt[any]
+	Evt         event.IEvt[any]
 
 	// the ID used to unsubscribe the WebSocket listener
 	wsSubId int
