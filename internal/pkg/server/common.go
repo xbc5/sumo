@@ -6,11 +6,16 @@ import (
 	"net/http/httptest"
 
 	"github.com/xbc5/sumo/internal/pkg/config"
+	"github.com/xbc5/sumo/internal/pkg/event"
 )
 
 type Server struct {
 	checkOrigin TCheckOrigin
 	Config      config.Server
+	Evt         *event.Evt[any]
+
+	// the ID used to unsubscribe the WebSocket listener
+	wsSubId int
 }
 
 func (this *Server) createHandler() *http.ServeMux {
@@ -30,12 +35,18 @@ func (this *Server) Start() {
 	}
 }
 
+func (this Server) Stop() {
+	// no need to do conn.Close() here, ws handlers use defer conn.Close()
+	this.Evt.Unsub(this.wsSubId) // errors is "id not found", so what?
+}
+
 func (this *Server) StartTest() *httptest.Server {
 	return httptest.NewServer(this.createHandler())
 }
 
 func (this *Server) New() *Server {
 	this.Config = config.GetConfig().Server
+	this.subWs() // make responses to WebSocket
 	build := ServerBuilder{Server: this}
 	server := build.CheckOrigin(CheckOrigin).Build()
 	return server

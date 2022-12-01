@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"net/http"
@@ -22,19 +23,40 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func (this Server) handleWs(res http.ResponseWriter, req *http.Request) {
+type ctxKey string
+
+const (
+	connkey ctxKey = ctxKey("conn")
+)
+
+func (this *Server) subWs() {
+	this.wsSubId = this.Evt.Sub(ResReady, func(ctx context.Context, msg any) {
+		conn := ctx.Value(connkey).(*websocket.Conn)
+		if conn.WriteJSON(msg) != nil {
+			// errors when it can't get NextWriter, Encode, or Close
+			fmt.Printf("Cannot write JSON response") // TODO: log error
+		}
+	})
+}
+
+func (this *Server) handleWs(res http.ResponseWriter, req *http.Request) {
 	conn, err := upgrader.Upgrade(res, req, nil)
-	upgrader.CheckOrigin = this.checkOrigin
 	if err != nil {
-		fmt.Printf("WebSocket connection error") // TODO: log error
+		fmt.Printf("Cannot upgrade WebSocket connection") // TODO: log error
+		return
 	}
+	defer conn.Close()
+	upgrader.CheckOrigin = this.checkOrigin
+
+	ctx := context.WithValue(req.Context(), connkey, conn)
 
 	for {
-		_, p, err := conn.ReadMessage()
+		var data *any
+		err := conn.ReadJSON(data)
 		if err != nil {
 			fmt.Printf("WS read error") // TODO log error
 			break
 		}
-		fmt.Printf(string(p))
+		this.Evt.Pub(ctx, WsRecv, *data)
 	}
 }
