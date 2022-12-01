@@ -1,14 +1,18 @@
 package server
 
 import (
+	_ "embed"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
 
+//go:embed www/index.html
+var homePage string
+
 func HandleRoot(res http.ResponseWriter, req *http.Request) {
-	fmt.Printf("root handled")
+	fmt.Printf(homePage)
 }
 
 var upgrader = websocket.Upgrader{
