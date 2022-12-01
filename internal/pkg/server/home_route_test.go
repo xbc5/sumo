@@ -36,6 +36,19 @@ var _ = Describe("/", func() {
 			Expect(res.StatusCode).To(Equal(200))
 		})
 
+		It("should return text/html Content-Type", func() {
+			s := serv().Build().StartTest()
+			c := s.Client()
+			defer s.Close()
+
+			res, _ := c.Get(s.URL + "/")
+			if res != nil {
+				defer res.Body.Close()
+			}
+
+			Expect(res.Header.Get("Content-Type")).To(Equal("text/html; charset=utf-8"))
+		})
+
 		It("should return an expected result", func() {
 			s := serv().Build().StartTest()
 			c := s.Client()
