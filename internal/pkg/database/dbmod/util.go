@@ -1,4 +1,4 @@
-package model
+package dbmod
 
 func ToTag(name string) Tag {
 	return Tag{

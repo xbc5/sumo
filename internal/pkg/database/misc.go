@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/dbmod"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -9,10 +9,10 @@ import (
 
 func AutoMigrate(db *gorm.DB) (err error) {
 	errs := []error{
-		db.AutoMigrate(&model.Article{}),
-		db.AutoMigrate(&model.Author{}),
-		db.AutoMigrate(&model.Attachment{}),
-		db.AutoMigrate(&model.Pattern{}),
+		db.AutoMigrate(&dbmod.Article{}),
+		db.AutoMigrate(&dbmod.Author{}),
+		db.AutoMigrate(&dbmod.Attachment{}),
+		db.AutoMigrate(&dbmod.Pattern{}),
 	}
 	for _, e := range errs {
 		if e != nil {

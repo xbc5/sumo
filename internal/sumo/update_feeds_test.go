@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/xbc5/sumo/internal/sumo"
-	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/dbmod"
 	t "github.com/xbc5/sumo/internal/pkg/mytest"
 	"gorm.io/gorm"
 )
@@ -22,21 +22,21 @@ var _ = Describe("UpdateFeeds()", func() {
 		"should fetch URLs, patterns, and feeds then tag and save them in an expected manner",
 		func() {
 			a, stubs := newSumo()
-			var results []model.Feed
+			var results []dbmod.Feed
 			urls := []string{"https://Xurl1.com", "https://Xurl1.com"}
-			patterns := []model.Pattern{t.FakePattern(1, "Xone", []string{"Xtag1", "Xtag2"})}
+			patterns := []dbmod.Pattern{t.FakePattern(1, "Xone", []string{"Xtag1", "Xtag2"})}
 
 			a.GetFeedUrls = func(db *gorm.DB) ([]string, error) {
 				return urls, nil
 			}
-			a.GetPatterns = func(db *gorm.DB) ([]model.Pattern, error) {
+			a.GetPatterns = func(db *gorm.DB) ([]dbmod.Pattern, error) {
 				return patterns, nil
 			}
-			a.FetchFeed = func(url string) (model.Feed, error) {
+			a.FetchFeed = func(url string) (dbmod.Feed, error) {
 				Expect(url).To(BeElementOf(urls)) // does it pass the correct URLs?
 				return t.GetFeedStub(url)
 			}
-			a.TagFeed = func(f model.Feed, p []model.Pattern) (model.Feed, error) {
+			a.TagFeed = func(f dbmod.Feed, p []dbmod.Pattern) (dbmod.Feed, error) {
         // it's hard to deep equal check these because we don't absolutely
         // know the order, and gomega doesn't do deep equality checks of slices
         // that also ignore order. Instead, just chec that our custom URL is set
@@ -44,7 +44,7 @@ var _ = Describe("UpdateFeeds()", func() {
 				Expect(p).To(Equal(patterns)) // does it pass patterns correctly?
 				return t.TagStub(f, p)
 			}
-			a.SaveFeed = func(db *gorm.DB, f model.Feed) error {
+			a.SaveFeed = func(db *gorm.DB, f dbmod.Feed) error {
 				results = append(results, f)
 				return nil
 			}
@@ -103,7 +103,7 @@ var _ = Describe("UpdateFeeds()", func() {
 		It("should be called", func() {
 			a, stubs := newSumo()
 			called := 0
-			a.GetPatterns = func(db *gorm.DB) ([]model.Pattern, error) {
+			a.GetPatterns = func(db *gorm.DB) ([]dbmod.Pattern, error) {
 				called++
 				return stubs.Patterns, nil
 			}
@@ -122,7 +122,7 @@ var _ = Describe("UpdateFeeds()", func() {
 				a, stubs := newSumo()
 				called := 0
 				a.GetPatterns = t.GetPatternsErrStub
-				a.FetchFeed = func(url string) (model.Feed, error) {
+				a.FetchFeed = func(url string) (dbmod.Feed, error) {
 					called++
 					return stubs.Feed, nil
 				}
@@ -166,7 +166,7 @@ var _ = Describe("UpdateFeeds()", func() {
 				a, stubs := newSumo()
 				called := 0
 				a.GetFeedUrls = t.GetFeedUrlsErrStub
-				a.FetchFeed = func(url string) (model.Feed, error) {
+				a.FetchFeed = func(url string) (dbmod.Feed, error) {
 					called++
 					return stubs.Feed, nil
 				}
@@ -191,7 +191,7 @@ var _ = Describe("UpdateFeeds()", func() {
 		It("should prevent saving to the database when it errors", func() {
 			a, stubs := newSumo()
 			called := 0
-			a.SaveFeed = func(db *gorm.DB, feed model.Feed) error {
+			a.SaveFeed = func(db *gorm.DB, feed dbmod.Feed) error {
 				called++
 				return nil
 			}
@@ -206,7 +206,7 @@ var _ = Describe("UpdateFeeds()", func() {
 		It("should be called", func() {
 			a, stubs := newSumo()
 			called := 0
-			a.TagFeed = func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+			a.TagFeed = func(feed dbmod.Feed, patterns []dbmod.Pattern) (dbmod.Feed, error) {
 				called++
 				return stubs.Feed, nil
 			}
@@ -220,7 +220,7 @@ var _ = Describe("UpdateFeeds()", func() {
 			a, _ := newSumo()
 			called := 0
 			a.TagFeed = t.TagErrStub
-			a.SaveFeed = func(db *gorm.DB, feed model.Feed) error {
+			a.SaveFeed = func(db *gorm.DB, feed dbmod.Feed) error {
 				called++
 				return nil
 			}
@@ -234,7 +234,7 @@ var _ = Describe("UpdateFeeds()", func() {
 		It("should be called with expected URLs", func() {
 			a, stubs := newSumo()
 			fetched := []string{}
-			a.FetchFeed = func(url string) (model.Feed, error) {
+			a.FetchFeed = func(url string) (dbmod.Feed, error) {
 				fetched = append(fetched, url)
 				return stubs.Feed, nil
 			}
@@ -251,7 +251,7 @@ var _ = Describe("UpdateFeeds()", func() {
 			fnCalled := 0
 			a, stubs := newSumo()
 			a.FetchFeed = t.GetFeedErrStub
-			a.TagFeed = func(feed model.Feed, patterns []model.Pattern) (model.Feed, error) {
+			a.TagFeed = func(feed dbmod.Feed, patterns []dbmod.Pattern) (dbmod.Feed, error) {
 				fnCalled++
 				return stubs.Feed, nil
 			}
@@ -278,7 +278,7 @@ var _ = Describe("UpdateFeeds()", func() {
 			fnCalled := 0
 			a, _ := newSumo()
 			a.FetchFeed = t.GetFeedErrStub
-			a.SaveFeed = func(db *gorm.DB, feed model.Feed) error {
+			a.SaveFeed = func(db *gorm.DB, feed dbmod.Feed) error {
 				fnCalled++
 				return nil
 			}

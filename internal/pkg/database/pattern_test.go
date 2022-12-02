@@ -5,11 +5,11 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/xbc5/sumo/internal/pkg/database"
-	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/dbmod"
 	t "github.com/xbc5/sumo/internal/pkg/mytest"
 )
 
-func expectPatternTags(fixture model.Pattern, result model.Pattern, tagLen int) {
+func expectPatternTags(fixture dbmod.Pattern, result dbmod.Pattern, tagLen int) {
 	Expect(result.Name).To(Equal(fixture.Name))
 	Expect(result.Description).To(Equal(fixture.Description))
 	Expect(result.Pattern).To(Equal(fixture.Pattern))
@@ -24,7 +24,7 @@ var _ = Describe("AddPattern() and GetPatterns()", func() {
 	Context("AddPattern() adds multiple records", func() {
 		It("should not error", func() {
 			db := t.OpenDB()
-			fixtures := []model.Pattern{
+			fixtures := []dbmod.Pattern{
 				t.FakePattern(0, ".pattern0.", []string{"tag0", "tag1"}),
 				t.FakePattern(1, ".pattern1.", []string{"tag1", "tag2", "tag3"}),
 				t.FakePattern(2, ".pattern2.", []string{"tag1", "tag2", "tag3"}),

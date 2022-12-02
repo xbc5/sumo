@@ -3,32 +3,32 @@ package feed_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/dbmod"
 	"github.com/xbc5/sumo/internal/pkg/feed"
 	t "github.com/xbc5/sumo/internal/pkg/mytest"
 )
 
-func noTags() model.Feed {
+func noTags() dbmod.Feed {
 	authors := t.FakeAuthors([]string{"john doe", "jane doe"})
-	articles := []model.Article{
-		t.FakeArticle(1, []string{}, authors, 0, 0, []model.Attachment{}),
+	articles := []dbmod.Article{
+		t.FakeArticle(1, []string{}, authors, 0, 0, []dbmod.Attachment{}),
 	}
 	return t.FakeFeed(1, []string{}, articles)
 }
 
-func authors() []model.Author {
+func authors() []dbmod.Author {
 	return t.FakeAuthors([]string{"john doe", "jane doe"})
 }
 
-func articlesWithMatchingPatterns() ([]model.Article, []model.Pattern, [][]string) {
+func articlesWithMatchingPatterns() ([]dbmod.Article, []dbmod.Pattern, [][]string) {
 	tags0 := []string{"tagX", "tagY"}
 	tags1 := []string{"tagY", "tagZ"}
-	articles := []model.Article{
+	articles := []dbmod.Article{
 		// use empty tags for these
 		t.FakeArticle(0, []string{}, authors(), 0, 0, nil), // has "0" suffix
 		t.FakeArticle(1, []string{}, authors(), 0, 0, nil), // has "1" suffix
 	}
-	patterns := []model.Pattern{
+	patterns := []dbmod.Pattern{
 		t.FakePattern(0, "0", tags0), // matches 0
 		t.FakePattern(1, "1", tags1), // matches 1
 	}
@@ -36,20 +36,20 @@ func articlesWithMatchingPatterns() ([]model.Article, []model.Pattern, [][]strin
 	return articles, patterns, [][]string{tags0, tags1}
 }
 
-func aPatternThatMatchesOnlyFeed() ([]model.Feed, []model.Pattern, [][]string) {
+func aPatternThatMatchesOnlyFeed() ([]dbmod.Feed, []dbmod.Pattern, [][]string) {
 	tags0 := []string{"tagX", "tagY"}
 	tags1 := []string{"tagY", "tagZ"}
 
-	articles0 := []model.Article{
+	articles0 := []dbmod.Article{
 		t.FakeArticle(996, []string{}, authors(), 0, 0, nil),
 		t.FakeArticle(997, []string{}, authors(), 0, 0, nil),
 	}
-	articles1 := []model.Article{
+	articles1 := []dbmod.Article{
 		t.FakeArticle(998, []string{}, authors(), 0, 0, nil),
 		t.FakeArticle(999, []string{}, authors(), 0, 0, nil),
 	}
 
-	patterns := []model.Pattern{
+	patterns := []dbmod.Pattern{
 		t.FakePattern(0, "100", tags0),
 		t.FakePattern(1, "111", tags1),
 	}
@@ -58,24 +58,24 @@ func aPatternThatMatchesOnlyFeed() ([]model.Feed, []model.Pattern, [][]string) {
 	feed0 := t.FakeFeed(100, tags0, articles0)
 	feed1 := t.FakeFeed(111, tags1, articles1)
 
-	return []model.Feed{feed0, feed1}, patterns, [][]string{tags0, tags1}
+	return []dbmod.Feed{feed0, feed1}, patterns, [][]string{tags0, tags1}
 }
 
-func feedWithMatchingArticles() ([]model.Feed, []model.Pattern, [][]string) {
+func feedWithMatchingArticles() ([]dbmod.Feed, []dbmod.Pattern, [][]string) {
 	tags0 := []string{"tagX", "tagY"}
 	tags1 := []string{"tagY", "tagZ"}
 
-	articles0 := []model.Article{
+	articles0 := []dbmod.Article{
 		// WARN: Go will change 000 => 0, so be careful
 		t.FakeArticle(100, []string{}, authors(), 0, 0, nil),
 		t.FakeArticle(11100, []string{}, authors(), 0, 0, nil), // should match 111 and 100
 	}
-	articles1 := []model.Article{
+	articles1 := []dbmod.Article{
 		t.FakeArticle(999, []string{}, authors(), 0, 0, nil),
 		t.FakeArticle(111, []string{}, authors(), 0, 0, nil),
 	}
 
-	patterns := []model.Pattern{
+	patterns := []dbmod.Pattern{
 		t.FakePattern(0, "100", tags0), // should match feed
 		t.FakePattern(1, "111", tags1), // this too
 	}
@@ -83,19 +83,19 @@ func feedWithMatchingArticles() ([]model.Feed, []model.Pattern, [][]string) {
 	feed0 := t.FakeFeed(998, []string{}, articles0)
 	feed1 := t.FakeFeed(999, []string{}, articles1)
 
-	return []model.Feed{feed0, feed1}, patterns, [][]string{tags0, tags1}
+	return []dbmod.Feed{feed0, feed1}, patterns, [][]string{tags0, tags1}
 }
 
-func feedWithNoArticles() (model.Feed, []model.Pattern) {
-	feed := model.Feed{
+func feedWithNoArticles() (dbmod.Feed, []dbmod.Pattern) {
+	feed := dbmod.Feed{
 		URL:         "",
 		Title:       "abc",
 		Description: "abc",
 		Language:    "",
-		Tags:        []model.Tag{},
+		Tags:        []dbmod.Tag{},
 		Logo:        "",
 	}
-	patterns := []model.Pattern{
+	patterns := []dbmod.Pattern{
 		t.FakePattern(0, "bar", []string{"foo"}),
 	}
 	return feed, patterns
@@ -106,7 +106,7 @@ var _ = Describe("tagger pkg", func() {
 		It("should return the associated tags", func() {
 			texts := []string{"foo", "bar"}
 			tags := []string{"tag1", "tag2"}
-			patterns := []model.Pattern{
+			patterns := []dbmod.Pattern{
 				t.FakePattern(1, "foo", tags),
 			}
 
@@ -127,7 +127,7 @@ var _ = Describe("tagger pkg", func() {
 			texts := []string{"foo", "bar"}
 			tags1 := []string{"tag1", "tag2"}
 			tags2 := []string{"tag2", "tag3"}
-			patterns := []model.Pattern{
+			patterns := []dbmod.Pattern{
 				t.FakePattern(1, "foo", tags1),
 				t.FakePattern(1, "bar", tags2),
 			}
@@ -153,7 +153,7 @@ var _ = Describe("tagger pkg", func() {
 		It("should return deduped tags", func() {
 			texts := []string{"foo", "foo"}
 			tags1 := []string{"tag1", "tag2"}
-			patterns := []model.Pattern{
+			patterns := []dbmod.Pattern{
 				t.FakePattern(1, "foo", tags1),
 			}
 
@@ -172,7 +172,7 @@ var _ = Describe("tagger pkg", func() {
 		It("should return the associated tags", func() {
 			texts := []string{"foo", "bar"}
 			tags := []string{"tag1", "tag2"}
-			patterns := []model.Pattern{
+			patterns := []dbmod.Pattern{
 				t.FakePattern(1, "bad-match", tags),
 			}
 
@@ -292,7 +292,7 @@ var _ = Describe("tagger pkg", func() {
 			result0, _ := feed.Tag(fixture[0], patterns)
 			result1, _ := feed.Tag(fixture[1], patterns)
 
-			for _, feed := range []model.Feed{result0, result1} {
+			for _, feed := range []dbmod.Feed{result0, result1} {
 				for _, article := range feed.Articles {
 					Expect(article.Tags).NotTo(BeNil())
 					Expect(article.Tags).To(HaveLen(0))
@@ -379,7 +379,7 @@ var _ = Describe("tagger pkg", func() {
 			result1, _ := feed.Tag(fakeFeed[1], patterns)
 
 			// article tags should not have matched
-			for _, feed := range []model.Feed{result0, result1} {
+			for _, feed := range []dbmod.Feed{result0, result1} {
 				Expect(feed.Tags).NotTo(BeNil())
 				Expect(feed.Tags).To(HaveLen(0))
 			}

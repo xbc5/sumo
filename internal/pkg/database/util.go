@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 
-	"github.com/xbc5/sumo/internal/pkg/database/model"
+	"github.com/xbc5/sumo/internal/pkg/database/dbmod"
 	"github.com/xbc5/sumo/internal/pkg/log"
 )
 
@@ -24,7 +24,7 @@ func RowsToStrings(rows *sql.Rows) []string {
 	return result
 }
 
-func ToFeedUrls(feeds *[]*model.Feed) []string {
+func ToFeedUrls(feeds *[]*dbmod.Feed) []string {
 	var urls []string
 	for _, f := range *feeds {
 		urls = append(urls, f.URL)
