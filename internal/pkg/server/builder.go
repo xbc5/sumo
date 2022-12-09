@@ -5,7 +5,6 @@ import "github.com/xbc5/sumo/internal/pkg/event"
 type ServerBuilder struct {
 	Server      *Server
 	checkOrigin bool
-	evt         bool
 }
 
 func (this *ServerBuilder) CheckOrigin(fn TCheckOrigin) *ServerBuilder {
@@ -14,20 +13,15 @@ func (this *ServerBuilder) CheckOrigin(fn TCheckOrigin) *ServerBuilder {
 	return this
 }
 
-func (this *ServerBuilder) Evt(evt event.IEvt[any]) *ServerBuilder {
-	this.Server.Evt = evt
-	this.evt = true
-	return this
-}
-
 func (this ServerBuilder) Build() *Server {
+	if this.Server.Evt == nil {
+		evt := &event.EvtChans{}
+		this.Server.Evt = evt.New()
+	}
+
 	if !this.checkOrigin {
 		this.Server.checkOrigin = CheckOriginStub
 	}
 
-	if !this.evt {
-		this.Server.Evt = NewOkEvtStub()
-	}
-	this.Server.subWs()
 	return this.Server
 }

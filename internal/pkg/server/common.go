@@ -12,10 +12,7 @@ import (
 type Server struct {
 	checkOrigin TCheckOrigin
 	Config      config.Server
-	Evt         event.IEvt[any]
-
-	// the ID used to unsubscribe the WebSocket listener
-	wsSubId int
+	Evt         *event.EvtChans
 }
 
 func (this *Server) createHandler() *http.ServeMux {
@@ -33,23 +30,21 @@ func (this *Server) Start() {
 	if err != nil {
 		fmt.Errorf("Cannot start server: %s", err) // TODO log error
 	}
+	go this.listenForEvents() // blocking
 }
 
-func (this Server) Stop() {
-	this.Evt.Unsub(this.wsSubId) // errors is "id not found", so what?
+func (this *Server) Stop() {
+	this.Evt.Sys <- event.Sys{Cmd: event.StopCmd}
 }
 
 func (this *Server) StartTest() *httptest.Server {
+	go this.listenForEvents() // blocking
 	return httptest.NewServer(this.createHandler())
 }
 
 func (this *Server) New() *Server {
 	this.Config = config.GetConfig().Server
-	this.subWs() // make responses to WebSocket
 	build := ServerBuilder{Server: this}
-	if this.Evt == nil {
-		this.Evt = &event.Evt[any]{}
-	}
 	server := build.CheckOrigin(CheckOrigin).Build()
 	return server
 }

@@ -1,15 +1,15 @@
 package server_test
 
 import (
-	"context"
 	"fmt"
+	"net/http/httptest"
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/xbc5/sumo/internal/pkg/event"
 	"github.com/xbc5/sumo/internal/pkg/server"
 )
 
@@ -28,7 +28,63 @@ func close(conn *websocket.Conn) {
 	}
 }
 
-const input = `{ "fake": "fake value" }`
+func write(
+	conn *websocket.Conn,
+	results chan any,
+	msgs int,
+) {
+	defer close(conn)
+	for i := 0; i < msgs; i++ {
+		conn.WriteJSON(input())
+		var r interface{}
+		conn.ReadJSON(&r)
+		results <- r
+	}
+}
+
+func echo() (*event.Msg, *httptest.Server, *websocket.Conn, *int) {
+	s := serv().Build()
+	called := 0
+
+	go func(s *server.Server, called *int) {
+		for msg := range s.Evt.NewReq {
+			s.Evt.NewRes <- msg
+			*called++
+		}
+	}(s, &called)
+
+	server := s.StartTest()
+
+	conn, _, _ := websocket.DefaultDialer.Dial(wsUrl(server.URL), nil)
+	conn.WriteJSON(input())
+
+	// should be an echo; also blocks (will hang test on error)
+	result := event.Msg{}
+	go conn.ReadJSON(&result)
+
+	return &result, server, conn, &called
+}
+
+// const input = `{ "fake": "fake value" }`
+type fakeInput struct {
+	Fake string `json:"fake"`
+}
+
+func fakeMapResult() map[string]any {
+	// use "any" because event.Msg.Data is any, which is the DTO that we use.
+	// This makes it easier to match against. The data can literally be anything,
+	// we do not test this at all. We only test that a generic message can be passed
+	// to and from the server.
+	return map[string]any{
+		"fake": "fake value",
+	}
+}
+
+func input() fakeInput {
+	return fakeInput{
+		Fake: "fake value",
+	}
+}
 
 var _ = Describe("/ws route", func() {
 	Context("when connecting", func() {
@@ -52,61 +108,65 @@ var _ = Describe("/ws route", func() {
 
 				conn, _, _ := websocket.DefaultDialer.Dial(wsUrl(s.URL), nil)
 				defer close(conn)
-				err := conn.WriteJSON(input)
+				err := conn.WriteJSON(input())
 
 				Expect(err).To(BeNil())
 			})
 
-			It("should receive an expected value", func() {
-				s := serv().Build().StartTest()
-				defer s.Close()
-				var result interface{}
-
-				conn, _, _ := websocket.DefaultDialer.Dial(wsUrl(s.URL), nil)
+			It("should receive an expected data value", func() {
+				result, server, conn, _ := echo()
+				defer server.Close()
 				defer close(conn)
-				conn.WriteJSON(input)
 
-				// should be an echo; also blocks (will hang test on error)
-				go conn.ReadJSON(&result)
+				Eventually(func() any {
+					return result.Data
+				}).WithTimeout(time.Second).Should(Equal(fakeMapResult()))
+			})
 
-				Eventually(func() interface{} {
-					return result
-				}).WithTimeout(time.Second).Should(Equal(input))
+			It("should receive a UUID value", func() {
+				result, server, conn, _ := echo()
+				defer server.Close()
+				defer close(conn)
+
+				uuidPat := `[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}`
+				Eventually(func() any {
+					return fmt.Sprintf("%s", result.UUID)
+				}).WithTimeout(time.Second).Should(MatchRegexp(uuidPat))
 			})
 		})
 
 		Context("the server", func() {
 			It("should emit one response", func(ctx SpecContext) {
-				called := 0
-				evt := server.NewOkEvtStub()
-				evt.Sub(server.ResReady, func(_ context.Context, _ any) {
-					called++
-				})
-				s := serv().Evt(evt).Build().StartTest()
-				defer s.Close()
-
-				conn, _, _ := websocket.DefaultDialer.Dial(wsUrl(s.URL), nil)
+				_, server, conn, called := echo()
+				defer server.Close()
 				defer close(conn)
-				conn.WriteJSON(input)
-				Eventually(func() int { return called }).WithTimeout(time.Second).Should(Equal(1))
+
+				// Eventually() will return as soon as called == 1; we want to make sure it doesn't go
+				// beyond 1.
+				time.Sleep(time.Millisecond * 500)
+
+				Expect(*called).To(Equal(1))
 			})
 		})
 	})
 
 	Context("when sending an invalid message", func() {
 		Context("the server", func() {
-			It("should recover and allow subsequent connections", func() {
+			It("should not close the socket (error)", func() {
 				s := serv().Build().StartTest()
 				defer s.Close()
 
 				conn, _, _ := websocket.DefaultDialer.Dial(wsUrl(s.URL), nil)
+
+				// do first message
 				defer close(conn)
 				conn.WriteMessage(websocket.TextMessage, []byte("bad message"))
 
+				// try another message
 				time.Sleep(time.Millisecond * 100)
-				_, _, err := websocket.DefaultDialer.Dial(wsUrl(s.URL), nil)
+				err := conn.WriteMessage(1, []byte("another bad message"))
 
-				Expect(err).To(BeNil()) // errors if StatusCode != 101 (amongst other things)
+				Expect(err).To(BeNil())
 			})
 		})
 	})
@@ -114,37 +174,39 @@ var _ = Describe("/ws route", func() {
 	Context("with multiple concurrent connections", func() {
 		Context("the server", func() {
 			It("should handle them all", func() {
-				s := serv().Build().StartTest()
-				defer s.Close()
-				max := 100
-				results := []interface{}{}
-				var mu sync.Mutex
+				threads := 1000 // concurrent connections
+				msgs := 10      // messages per thread
+				expected := threads * msgs
 
+				s := serv().Build()
+				httpserv := s.StartTest()
+				defer httpserv.Close()
+
+				go func(s *server.Server) {
+					for msg := range s.Evt.NewReq {
+						s.Evt.NewRes <- msg
+					}
+				}(s)
+
+				rchan := make(chan interface{}, expected*2)
+
+				// create T connections, where T = threads;
 				conns := []*websocket.Conn{}
-				for i := 0; i < max; i++ {
-					conn, _, _ := websocket.DefaultDialer.Dial(wsUrl(s.URL), nil)
+				for i := 0; i < threads; i++ {
+					conn, _, _ := websocket.DefaultDialer.Dial(wsUrl(httpserv.URL), nil)
 					conns = append(conns, conn)
 				}
 
-				var wg sync.WaitGroup
-				wg.Add(max)
+				// send M messages to T threads, where threads = T = M => TM
+				// e.g. threads = 100; send 100 messages, for each of 100 threads.
 				for _, conn := range conns {
-					go func(wg *sync.WaitGroup, conn *websocket.Conn, results *[]interface{}) {
-						defer close(conn)
-						defer wg.Done()
-						for i := 0; i < max; i++ {
-							conn.WriteJSON(input)
-							var r interface{}
-							conn.ReadJSON(&r)
-							mu.Lock()
-							*results = append(*results, r)
-							mu.Unlock()
-						}
-					}(&wg, conn, &results)
+					go write(conn, rchan, msgs)
 				}
-				wg.Wait()
 
-				Eventually(func() int { return len(results) }).Should(Equal(max * max))
+				Eventually(
+					func() int { return len(rchan) },
+				).WithTimeout(time.Second * 5).
+					Should(Equal(expected))
 			})
 		})
 	})
