@@ -44,11 +44,11 @@ func sendJobs(ch chan string, jobs []string) chan string {
 
 func (this *Sumo) canUpdateFeed() bool {
 	this.updateFeedMutex.Lock()
+	defer this.updateFeedMutex.Unlock()
 	if this.updateFeedInProgress {
 		return false
 	}
 	this.updateFeedInProgress = true
-	this.updateFeedMutex.Unlock()
 	return true
 }
 
